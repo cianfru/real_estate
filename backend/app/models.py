@@ -51,7 +51,7 @@ class Lotto(Base):
     lot_key: Mapped[str] = mapped_column(String(200), unique=True)
     key_is_provisional: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     tribunale_id: Mapped[int] = mapped_column(ForeignKey("tribunali.id"))
-    rge_numero: Mapped[str | None] = mapped_column(String(20))
+    rge_numero: Mapped[str | None] = mapped_column(String(60))
     rge_anno: Mapped[int | None] = mapped_column(Integer)
     lotto_codice: Mapped[str | None] = mapped_column(String(60))
 
@@ -94,6 +94,25 @@ class Lotto(Base):
     has_detail: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     cover_image_path: Mapped[str | None] = mapped_column(Text)
 
+    # market analysis (filled by ingest.analytics; see docs/market-analysis.md)
+    segment: Mapped[str | None] = mapped_column(String(20))
+    superficie_source: Mapped[str | None] = mapped_column(String(10))  # pvp | testo
+    quota_parziale: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    eur_mq: Mapped[Decimal | None] = mapped_column(Numeric(12, 2))
+    eur_mq_stima: Mapped[Decimal | None] = mapped_column(Numeric(12, 2))
+    zona_level: Mapped[str | None] = mapped_column(String(10))  # hex | comune | provincia
+    zona_key: Mapped[str | None] = mapped_column(String(160))
+    zona_label: Mapped[str | None] = mapped_column(String(160))
+    zona_n: Mapped[int | None] = mapped_column(Integer)
+    zona_eur_mq: Mapped[Decimal | None] = mapped_column(Numeric(12, 2))
+    zona_p25: Mapped[Decimal | None] = mapped_column(Numeric(12, 2))
+    zona_p75: Mapped[Decimal | None] = mapped_column(Numeric(12, 2))
+    sconto_zona_pct: Mapped[float | None] = mapped_column(Float)  # vs the zone's appraised €/m²
+    zona_asta_eur_mq: Mapped[Decimal | None] = mapped_column(Numeric(12, 2))  # typical auction €/m² in the zone
+    sconto_aste_pct: Mapped[float | None] = mapped_column(Float)  # vs the zone's auction €/m²
+    opportunity: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    opportunity_since: Mapped[datetime | None] = mapped_column(TS)
+
     status: Mapped[str] = mapped_column(String(20), default="active", server_default="active")
     missed_runs: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     merged_into_id: Mapped[int | None] = mapped_column(ForeignKey("lotti.id"))
@@ -117,6 +136,8 @@ class Lotto(Base):
         Index("ix_lotti_category", "category"),
         Index("ix_lotti_comune", "comune"),
         Index("ix_lotti_first_seen", "first_seen"),
+        Index("ix_lotti_opportunity", "opportunity"),
+        Index("ix_lotti_segment", "segment"),
     )
 
 
@@ -234,6 +255,92 @@ class IngestRun(Base):
     finished_at: Mapped[datetime | None] = mapped_column(TS)
     counts: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     errors: Mapped[list[str] | None] = mapped_column(JSONB)
+
+
+# ---------------------------------------------------------------- market history
+
+
+class StoricoVendita(Base):
+    """One row per PVP sale (any date), slim: the raw material of the market analysis.
+    Filled from search pages only (no details), nationally."""
+
+    __tablename__ = "storico_vendite"
+
+    pvp_id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=False)
+    trib_code: Mapped[str] = mapped_column(String(16))
+    rge_numero: Mapped[str | None] = mapped_column(String(60))
+    lotto_codice: Mapped[str | None] = mapped_column(String(60))
+    comune: Mapped[str | None] = mapped_column(String(120))
+    provincia: Mapped[str | None] = mapped_column(String(80))
+    lat: Mapped[float | None] = mapped_column(Float)
+    lon: Mapped[float | None] = mapped_column(Float)
+    category: Mapped[str | None] = mapped_column(String(60))
+    subtype: Mapped[str | None] = mapped_column(String(60))
+    segment: Mapped[str | None] = mapped_column(String(20))
+    superficie: Mapped[float | None] = mapped_column(Float)
+    quota_parziale: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    prezzo_base: Mapped[Decimal | None] = mapped_column(Numeric(14, 2))
+    data_vendita: Mapped[date | None] = mapped_column(Date)
+    data_pubblicazione: Mapped[date | None] = mapped_column(Date)
+    esito: Mapped[str | None] = mapped_column(String(10))
+    updated_at: Mapped[datetime] = mapped_column(TS, server_default=func.now(), onupdate=func.now())
+
+    __table_args__ = (
+        Index("ix_storico_data", "data_vendita"),
+        Index("ix_storico_segment", "segment"),
+        Index("ix_storico_lot", "trib_code", "rge_numero", "lotto_codice"),
+    )
+
+
+class AreaStat(Base):
+    """Appraised €/m² per zone and segment (median of first-round prices per m²)."""
+
+    __tablename__ = "area_stats"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    segment: Mapped[str] = mapped_column(String(20))
+    level: Mapped[str] = mapped_column(String(10))  # hex | comune | provincia | italia
+    key: Mapped[str] = mapped_column(String(160))
+    label: Mapped[str | None] = mapped_column(String(160))
+    n: Mapped[int] = mapped_column(Integer)
+    median: Mapped[float] = mapped_column(Float)
+    p25: Mapped[float] = mapped_column(Float)
+    p75: Mapped[float] = mapped_column(Float)
+    asta_median: Mapped[float | None] = mapped_column(Float)  # current auction €/m² of active lots
+    n_active: Mapped[int] = mapped_column(Integer, default=0)
+    n_opportunities: Mapped[int] = mapped_column(Integer, default=0)
+    trend_pct: Mapped[float | None] = mapped_column(Float)  # last 12 months vs the 12 before
+    center_lon: Mapped[float | None] = mapped_column(Float)
+    center_lat: Mapped[float | None] = mapped_column(Float)
+    polygon: Mapped[list[Any] | None] = mapped_column(JSONB)
+    computed_at: Mapped[datetime] = mapped_column(TS, server_default=func.now())
+
+    __table_args__ = (
+        UniqueConstraint("segment", "level", "key", name="uq_area_stat"),
+        Index("ix_area_stats_center", "level", "segment", "center_lon", "center_lat"),
+    )
+
+
+class PriceIndex(Base):
+    """Quarterly €/m²: appraisals (first rounds) and auction base prices (every round)."""
+
+    __tablename__ = "price_index"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    segment: Mapped[str] = mapped_column(String(20))
+    level: Mapped[str] = mapped_column(String(10))  # italia | provincia
+    key: Mapped[str] = mapped_column(String(120))
+    quarter: Mapped[str] = mapped_column(String(7))  # 2024-Q3
+    period_start: Mapped[date] = mapped_column(Date)
+    n_stime: Mapped[int] = mapped_column(Integer)
+    stima_eur_mq: Mapped[float | None] = mapped_column(Float)
+    n_aste: Mapped[int] = mapped_column(Integer)
+    asta_eur_mq: Mapped[float | None] = mapped_column(Float)
+    n_deserte: Mapped[int] = mapped_column(Integer, default=0)
+    # PVP published (almost) nothing this quarter: values are null on purpose, see pvp-api.md
+    gap: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+
+    __table_args__ = (UniqueConstraint("segment", "level", "key", "quarter", name="uq_price_index"),)
 
 
 # ---------------------------------------------------------------- app tables

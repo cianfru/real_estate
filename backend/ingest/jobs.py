@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import traceback
 from collections.abc import Callable
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from typing import Any
 
 from sqlalchemy.orm import Session
@@ -59,24 +59,45 @@ def sync(scope: str, with_details: bool = True) -> IngestRun:
     return run_job("sync", scope, _do)
 
 
+def history(scope: str, since: date) -> IngestRun:
+    from ingest.history import backfill
+
+    def _do(db: Session, run: IngestRun) -> dict[str, Any]:
+        client = PvpClient()
+        try:
+            return backfill(db, client, scope, since)
+        finally:
+            client.close()
+
+    return run_job("history", scope, _do)
+
+
+def analytics() -> IngestRun:
+    from ingest.analytics import run_analytics
+
+    return run_job("analytics", None, lambda db, run: run_analytics(db, run=run))
+
+
 def geocode(limit: int | None = None) -> IngestRun:
     from ingest.geocode import geocode_missing
 
     return run_job("geocode", None, lambda db, run: geocode_missing(db, limit=limit, run=run))
 
 
-def alerts(sync_run_id: int | None = None) -> IngestRun:
+def alerts(sync_run_id: int | None = None, run_ids: list[int] | None = None) -> IngestRun:
     from app.services.alerts import run_alerts
 
-    return run_job("alerts", None, lambda db, run: run_alerts(db, run_id=sync_run_id))
+    return run_job("alerts", None, lambda db, run: run_alerts(db, run_id=sync_run_id, run_ids=run_ids))
 
 
 def nightly(scope: str = "italy", send_alerts: bool = True) -> None:
-    """The scheduled job: sync, geocode what PVP left unplaced, then alerts for this run's events."""
-    run = sync(scope)
-    try:
-        geocode()
-    except Exception:  # noqa: BLE001 - geocoding failures must not block alerts
-        log.exception("geocode failed")
+    """The scheduled job: sync, geocode what PVP left unplaced, recompute zone values, then one
+    alert digest for tonight's events (sync: new lots/rounds/drops; analytics: opportunities)."""
+    run_ids = [sync(scope).id]
+    for step in (geocode, analytics):
+        try:
+            run_ids.append(step().id)
+        except Exception:  # noqa: BLE001 - a failing step must not block the alerts
+            log.exception("%s failed", step.__name__)
     if send_alerts:
-        alerts(run.id)
+        alerts(run_ids=run_ids)

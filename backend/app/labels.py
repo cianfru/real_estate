@@ -51,6 +51,7 @@ ALLEGATI = {
 }
 
 EVENTI = {
+    "opportunity": "Sotto il valore di zona",
     "new_lot": "Nuovo immobile",
     "new_round": "Nuovo esperimento",
     "price_drop": "Ribasso",

@@ -45,6 +45,13 @@ The *current* round is the earliest upcoming one, or the latest past one if none
 
 Rows are never hard-deleted.
 
+**Valuation columns**, written by the nightly analytics (`docs/market-analysis.md`):
+`segment` (residenziale / commerciale / industriale / box / terreni), `superficie_source`
+(`pvp` | `testo`), `quota_parziale`, `eur_mq` (current base price per m²), `eur_mq_stima` (own
+appraisal per m²), the benchmark zone (`zona_level`, `zona_key`, `zona_label`, `zona_n`,
+`zona_eur_mq`, `zona_p25`, `zona_p75`, `zona_asta_eur_mq`), the discounts `sconto_zona_pct` and
+`sconto_aste_pct`, and `opportunity` + `opportunity_since`.
+
 ### `vendite`: one auction round
 `pvp_id` (unique), `lotto_id`, `data_vendita`, `termine_offerte`, prices, `modalita`,
 `tipo_vendita`, `valore_stima`, `round_number` (1-based, by date), `stato_pvp`, `esito`,
@@ -89,8 +96,22 @@ Normalised query string (PK) → lat/lon/source/confidence. Negative results are
 Nominatim is never asked the same thing twice.
 
 ### `ingest_runs`
-`kind` (`sync` / `geocode` / `alerts`), `scope`, `status` (`running` / `ok` / `failed`),
+`kind` (`sync` / `geocode` / `analytics` / `alerts` / `history`), `scope`, `status` (`running` / `ok` / `failed`),
 `started_at`, `finished_at`, `counts` (jsonb), `errors` (jsonb). Shown on the Admin page.
+
+## Market analysis tables
+
+Rebuilt by `python -m ingest analytics`; see `docs/market-analysis.md`. No personal data.
+
+- `storico_vendite`: one slim row per PVP real-estate sale since 2019 (PK `pvp_id`): court,
+  RGE number, lot code, comune, provincia, lat/lon, category/subtype/segment, surface,
+  `quota_parziale`, base price, sale and publication dates, outcome. Filled by the one-off
+  `history` backfill and by every list sync.
+- `area_stats`: one row per (segment, level, key) with level `hex` | `hexL` | `comune` |
+  `provincia` | `italia`: appraisal count, median, p25, p75, auction median of active lots, active
+  and opportunity counts, 12-month trend, centre and (hexagons) polygon.
+- `price_index`: one row per (segment, level `italia`|`provincia`, key, quarter): rolling median
+  appraisal and auction €/m², counts, deserted rounds, and `gap` for quarters PVP left empty.
 
 ## App tables
 

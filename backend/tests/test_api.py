@@ -83,7 +83,7 @@ def test_geojson(api: TestClient) -> None:
     fc = r.json()
     with_coords = api.get("/lotti", params={"has_coords": "true"}).json()["total"]
     assert fc["type"] == "FeatureCollection" and len(fc["features"]) == with_coords > 0
-    assert set(fc["features"][0]["properties"]) == {"id", "c", "p", "a", "t", "m"}
+    assert set(fc["features"][0]["properties"]) == {"id", "c", "p", "a", "t", "m", "o", "s"}
 
 
 @pytest.mark.usefixtures("synced")

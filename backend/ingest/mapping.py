@@ -13,6 +13,8 @@ from decimal import Decimal, InvalidOperation
 from typing import Any
 from zoneinfo import ZoneInfo
 
+from ingest.valuation import extract_surface, is_partial_ownership, segment_of
+
 ROME = ZoneInfo("Europe/Rome")
 
 # ------------------------------------------------------------------ GDPR scrubbing
@@ -166,7 +168,7 @@ def norm_rge(num: str | None) -> str | None:
         return None
     n = re.sub(r"\s+", "", n)
     m = re.match(r"^0*(\d+)(.*)$", n)
-    return (m.group(1) + m.group(2)) if m else n
+    return ((m.group(1) + m.group(2)) if m else n)[:60]
 
 
 def make_lot_key(
@@ -227,6 +229,9 @@ class ListRow:
     cover_image: str | None
     list_hash: str
     raw: dict[str, Any] = field(repr=False)
+    segment: str | None = None
+    superficie: float | None = None  # from the description text
+    quota_parziale: bool = False
 
 
 # Sales without a court (e.g. Agenzia Entrate-Riscossione "esecuzioni esattoriali") have no
@@ -257,6 +262,8 @@ def parse_list_item(item: dict[str, Any]) -> ListRow:
     ll = valid_coords(coords.get("latitudine"), coords.get("longitudine"))
     disp = item.get("disponibilita") or []
     clean = scrub(item)
+    beni = list(item.get("categoriaBene") or [])
+    seg = segment_of(item.get("categoriaLotto"), beni[0] if beni else None)
     return ListRow(
         pvp_id=int(item["id"]),
         trib_code=str(item.get("codiceTribunale") or NO_COURT_CODE),
@@ -283,6 +290,9 @@ def parse_list_item(item: dict[str, Any]) -> ListRow:
         cover_image=item.get("immagineCover") or item.get("immagine"),
         list_hash=stable_hash({k: item.get(k) for k in LIST_HASH_FIELDS}),
         raw=clean,
+        segment=seg,
+        superficie=extract_surface(item.get("descLotto"), land=seg == "terreni"),
+        quota_parziale=is_partial_ownership(item.get("descLotto")),
     )
 
 
@@ -382,6 +392,9 @@ class DetailRow:
     contacts: list[ContactRow]
     content_hash: str
     raw: dict[str, Any] = field(repr=False)
+    segment: str | None = None
+    superficie_source: str | None = None
+    quota_parziale: bool = False
 
 
 # SOGGSPV = the person who arranges viewings ("soggetto per la visita").
@@ -446,9 +459,14 @@ def parse_detail(d: dict[str, Any]) -> DetailRow:
         surface = parse_surface(b.get("superficie"))
         if surface:
             break
+    surface_source = "pvp" if surface else None
     vani = next((float(b["numeroVani"]) for b in beni if b.get("numeroVani")), None)
     deposito = (d.get("datiDeposito") or {}).get("depoCauzionale")
     descr = lotto.get("descLotto") or first.get("descrizione")
+    seg = segment_of(lotto.get("codTipoCategLotto"), first.get("codTipologiaBene"))
+    if surface is None:
+        surface = extract_surface(descr, land=seg == "terreni")
+        surface_source = "testo" if surface else None
     clean = scrub(d)
     hash_src = {k: v for k, v in clean.items() if k not in ("siti", "numPagina", "numElementiPagina")}
 
@@ -506,4 +524,7 @@ def parse_detail(d: dict[str, Any]) -> DetailRow:
         contacts=contacts,
         content_hash=stable_hash(hash_src),
         raw=clean,
+        segment=seg,
+        superficie_source=surface_source,
+        quota_parziale=is_partial_ownership(descr),
     )

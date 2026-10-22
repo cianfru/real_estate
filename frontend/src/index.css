@@ -21,8 +21,15 @@
   --ok: #0f9d6b;
   --warn: #c98a0b;
   --bad: #d4405a;
-  --shadow: 0 1px 2px rgb(11 38 59 / 0.04), 0 8px 24px -8px rgb(11 38 59 / 0.12);
-  --shadow-lg: 0 2px 6px rgb(11 38 59 / 0.05), 0 24px 60px -20px rgb(11 38 59 / 0.28);
+  /* data-viz roles, validated with the dataviz skill's validator (all-pairs, light surface) */
+  --viz-appraisal: #2a78d6;
+  --viz-auction: #1baf7a;
+  --viz-opportunity: #c99a12;
+  --viz-context: #b4b8be;
+  --viz-grid: #e3e1db;
+  --viz-axis: #c3c2b7;
+  --shadow: 0 1px 2px rgb(11 38 59 / 0.03), 0 10px 30px -12px rgb(11 38 59 / 0.14);
+  --shadow-lg: 0 2px 8px rgb(11 38 59 / 0.04), 0 30px 70px -24px rgb(11 38 59 / 0.3);
   color-scheme: light;
 }
 
@@ -43,6 +50,12 @@
   --ok: #34d399;
   --warn: #fbbf24;
   --bad: #fb7185;
+  --viz-appraisal: #3987e5;
+  --viz-auction: #199e70;
+  --viz-opportunity: #b3890c;
+  --viz-context: #4a5562;
+  --viz-grid: #1e2833;
+  --viz-axis: #33404d;
   --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -8px rgb(0 0 0 / 0.5);
   --shadow-lg: 0 2px 6px rgb(0 0 0 / 0.3), 0 24px 60px -20px rgb(0 0 0 / 0.7);
   color-scheme: dark;
@@ -67,6 +80,10 @@
   --color-bad: var(--bad);
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-serif: "Newsreader", ui-serif, Georgia, serif;
+  --color-viz-appraisal: var(--viz-appraisal);
+  --color-viz-auction: var(--viz-auction);
+  --color-viz-opportunity: var(--viz-opportunity);
+  --color-viz-context: var(--viz-context);
   --shadow-soft: var(--shadow);
   --shadow-float: var(--shadow-lg);
 }
@@ -97,9 +114,6 @@ body {
   -webkit-backdrop-filter: saturate(180%) blur(20px);
 }
 
-.hairline {
-  border: 1px solid var(--line);
-}
 
 .scroll-thin {
   scrollbar-width: thin;
@@ -115,13 +129,13 @@ body {
 .maplibregl-ctrl-group {
   background: var(--glass) !important;
   backdrop-filter: blur(16px);
-  border-radius: 14px !important;
+  border-radius: 10px !important;
   box-shadow: var(--shadow) !important;
-  border: 1px solid var(--line);
+  border: 0;
   overflow: hidden;
 }
 .maplibregl-ctrl-group button + button {
-  border-top: 1px solid var(--line) !important;
+  border-top: 0 !important;
 }
 .dark .maplibregl-ctrl-group button .maplibregl-ctrl-icon {
   filter: invert(1);
@@ -138,10 +152,9 @@ body {
 .maplibregl-popup-content {
   background: var(--surface);
   color: var(--text);
-  border-radius: 14px;
+  border-radius: 10px;
   padding: 10px 12px;
   box-shadow: var(--shadow-lg);
-  border: 1px solid var(--line);
 }
 .maplibregl-popup-tip {
   display: none;
@@ -151,4 +164,12 @@ body {
   .no-print {
     display: none !important;
   }
+}
+
+/* horizontal strips (nav, tabs) scroll on phones without showing a bar */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

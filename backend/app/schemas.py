@@ -8,7 +8,9 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-SortKey = Literal["data_vendita", "termine", "prezzo_asc", "prezzo_desc", "ribasso", "nuovi", "superficie"]
+SortKey = Literal[
+    "data_vendita", "termine", "prezzo_asc", "prezzo_desc", "ribasso", "nuovi", "superficie", "opportunita", "eur_mq"
+]
 
 
 class LottoFilters(BaseModel):
@@ -35,6 +37,9 @@ class LottoFilters(BaseModel):
     new_days: int | None = None
     price_dropped: bool | None = None
     min_rounds: int | None = None
+    opportunity: bool | None = None
+    segment: list[str] = Field(default_factory=list)
+    min_sconto_zona: float | None = None
 
     @field_validator("bbox")
     @classmethod
@@ -101,6 +106,10 @@ class LottoListItem(BaseModel):
     first_seen: datetime
     cover_url: str | None
     has_detail: bool
+    segment: str | None = None
+    eur_mq: float | None = None
+    sconto_zona_pct: float | None = None
+    opportunity: bool = False
 
 
 class LottiPage(BaseModel):
@@ -199,6 +208,31 @@ class ShareLinkOut(BaseModel):
     created_at: datetime
 
 
+class ZonaOut(BaseModel):
+    level: str
+    key: str
+    label: str | None
+    n: int
+    eur_mq: float  # median appraised €/m²
+    p25: float | None
+    p75: float | None
+    asta_eur_mq: float | None = None  # median auction base price per m² in the zone
+
+
+class ComparableOut(BaseModel):
+    id: int
+    titolo: str
+    comune: str | None
+    eur_mq: float
+    prezzo_base: float | None
+    superficie_mq: float | None
+    sconto_zona_pct: float | None
+    distance_km: float
+    status: str
+    data_vendita: datetime | None
+    opportunity: bool
+
+
 class LottoDetail(LottoListItem):
     rge_numero: str | None
     rge_anno: int | None
@@ -229,6 +263,12 @@ class LottoDetail(LottoListItem):
     contatti: list[ContattoOut]
     share_links: list[ShareLinkOut]
     detail_fetched_at: datetime | None
+    eur_mq_stima: float | None = None
+    sconto_aste_pct: float | None = None
+    superficie_source: str | None = None
+    quota_parziale: bool = False
+    zona: ZonaOut | None = None
+    comparables: list[ComparableOut] = Field(default_factory=list)
 
 
 class PublicLotto(BaseModel):
@@ -269,6 +309,10 @@ class PublicLotto(BaseModel):
     allegati: list[AllegatoOut]
     pvp_url: str | None
     expires_at: datetime | None
+    eur_mq: float | None = None
+    eur_mq_stima: float | None = None
+    sconto_zona_pct: float | None = None
+    zona: ZonaOut | None = None
 
 
 class SavedSearchIn(BaseModel):

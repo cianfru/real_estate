@@ -32,6 +32,35 @@ export interface LottoListItem {
   first_seen: string;
   cover_url: string | null;
   has_detail: boolean;
+  segment: string | null;
+  eur_mq: number | null;
+  sconto_zona_pct: number | null;
+  opportunity: boolean;
+}
+
+export interface Zona {
+  level: "hex" | "hexL" | "comune" | "provincia";
+  key: string;
+  label: string | null;
+  n: number;
+  eur_mq: number;
+  p25: number | null;
+  p75: number | null;
+  asta_eur_mq: number | null;
+}
+
+export interface Comparable {
+  id: number;
+  titolo: string;
+  comune: string | null;
+  eur_mq: number;
+  prezzo_base: number | null;
+  superficie_mq: number | null;
+  sconto_zona_pct: number | null;
+  distance_km: number;
+  status: string;
+  data_vendita: string | null;
+  opportunity: boolean;
 }
 
 export interface LottiPage {
@@ -142,6 +171,12 @@ export interface LottoDetail extends LottoListItem {
   contatti: Contatto[];
   share_links: ShareLink[];
   detail_fetched_at: string | null;
+  eur_mq_stima: number | null;
+  sconto_aste_pct: number | null;
+  superficie_source: string | null;
+  quota_parziale: boolean;
+  zona: Zona | null;
+  comparables: Comparable[];
 }
 
 export interface PublicLotto {
@@ -180,6 +215,10 @@ export interface PublicLotto {
   allegati: Allegato[];
   pvp_url: string | null;
   expires_at: string | null;
+  eur_mq: number | null;
+  eur_mq_stima: number | null;
+  sconto_zona_pct: number | null;
+  zona: Zona | null;
 }
 
 export interface TribunaleMeta {
@@ -194,6 +233,7 @@ export interface TribunaleMeta {
 export interface Meta {
   tribunali: TribunaleMeta[];
   categorie: Record<string, string>;
+  segmenti: Record<string, string>;
   tipologie: Record<string, string>;
   modalita: Record<string, string>;
   tipo_vendita: Record<string, string>;
@@ -268,5 +308,63 @@ export interface AdminStats {
   by_tribunale: { id: number; name: string; active: boolean; count: number }[];
 }
 
-export type GeoFeature = GeoJSON.Feature<GeoJSON.Point, { id: number; c: string; p: number | null; a: 0 | 1; t: string | null; m: string | null }>;
-export type GeoCollection = GeoJSON.FeatureCollection<GeoJSON.Point, GeoFeature["properties"]>;
+export type GeoCollection = GeoJSON.FeatureCollection<GeoJSON.Point, GeoFeatureProps>;
+
+export type GeoFeatureProps = { id: number; c: string; p: number | null; a: 0 | 1; t: string | null; m: string | null; o: 0 | 1; s: number | null };
+
+export interface ZoneProps {
+  key: string;
+  lvl?: "hex" | "hexL";
+  label: string | null;
+  n: number;
+  median: number;
+  p25: number;
+  p75: number;
+  asta: number | null;
+  trend: number | null;
+  n_active: number;
+  n_opp: number;
+}
+export type ZoneCollection = GeoJSON.FeatureCollection<GeoJSON.Polygon | GeoJSON.Point, ZoneProps>;
+
+export interface MarketOverview {
+  segment: string;
+  segments: Record<string, string>;
+  area: { key: string; level: string; label: string };
+  provinces: { key: string; label: string; n: number }[];
+  computed_at: string | null;
+  kpis: {
+    stima_median: number | null;
+    stima_n: number;
+    stima_p25: number | null;
+    stima_p75: number | null;
+    asta_median: number | null;
+    trend_pct: number | null;
+    n_active: number;
+    n_benchmarked: number;
+    n_opportunities: number;
+    median_sconto: number | null;
+  };
+  index: { quarter: string; period_start: string; stima: number | null; asta: number | null; n_stime: number; n_aste: number; n_deserte: number; gap: boolean }[];
+  histogram: { from: number; to: number; n: number; opp: number }[];
+  scatter: { id: number; x: number | null; y: number | null; o: boolean; t: string }[];
+  comuni: (ZoneProps & { key: string })[];
+  opportunities: {
+    id: number;
+    titolo: string;
+    comune: string | null;
+    provincia: string | null;
+    prezzo_base: number | null;
+    superficie_mq: number | null;
+    eur_mq: number | null;
+    zona_eur_mq: number | null;
+    zona_label: string | null;
+    sconto_zona_pct: number | null;
+    sconto_aste_pct: number | null;
+    zona_asta_eur_mq: number | null;
+    data_vendita: string | null;
+    termine_offerte: string | null;
+    cover_url: string | null;
+    n_rounds: number;
+  }[];
+}

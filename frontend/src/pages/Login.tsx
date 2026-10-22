@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { LogoMark } from "@/components/Logo";
 import { Button, Field, Input } from "@/components/ui";
 import { post } from "@/lib/api";
@@ -23,46 +23,50 @@ export default function Login() {
   });
 
   return (
-    <div className="relative grid min-h-full place-items-center overflow-hidden px-4">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-70"
-        style={{
-          background:
-            "radial-gradient(60% 50% at 20% 10%, rgb(224 179 29 / 0.16), transparent 60%), radial-gradient(50% 50% at 90% 90%, rgb(11 38 59 / 0.14), transparent 60%)",
-        }}
-      />
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="relative w-full max-w-[400px]"
-      >
-        <div className="mb-8 flex flex-col items-center text-center">
-          <LogoMark className="size-14" />
-          <h1 className="mt-5 font-serif text-[34px] leading-tight tracking-tight text-ink">Legal Estate</h1>
-          <p className="mt-1 text-[14px] text-muted">Aste immobiliari con tutela legale · area riservata</p>
+    <div className="grid min-h-full lg:grid-cols-[1.1fr_1fr]">
+      <div className="relative hidden overflow-hidden bg-[#0b263b] lg:block">
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{ background: "radial-gradient(70% 60% at 25% 20%, rgb(224 179 29 / 0.18), transparent 60%)" }}
+        />
+        <div className="relative flex h-full flex-col justify-between p-14 text-[#f6f5f2]">
+          <LogoMark className="size-11" />
+          <div>
+            <p className="max-w-md font-serif text-[44px] leading-[1.08] tracking-tight">Aste immobiliari, con il rigore di uno studio legale.</p>
+            <p className="mt-5 max-w-sm text-[14px] leading-relaxed text-[#f6f5f2]/60">
+              Ogni asta giudiziaria pubblicata sul Portale delle Vendite Pubbliche, letta zona per zona.
+            </p>
+          </div>
+          <p className="text-[11px] tracking-[0.14em] text-[#e0b31d] uppercase">Legal Estate · Cadoneghe</p>
         </div>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            login.mutate();
-          }}
-          className="glass hairline space-y-4 rounded-3xl p-7 shadow-float"
-        >
-          <Field label="Email">
-            <Input type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} />
-          </Field>
-          <Field label="Password">
-            <Input type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
-          </Field>
-          {login.error && <p className="text-[13px] text-bad">{(login.error as Error).message}</p>}
-          <Button type="submit" variant="primary" className="w-full !h-11" loading={login.isPending} icon={!login.isPending ? <ArrowRight className="size-4" /> : undefined}>
-            Accedi
-          </Button>
-        </form>
-        <p className="mt-6 text-center text-[12px] text-faint">Dati dal Portale delle Vendite Pubbliche · Ministero della Giustizia</p>
-      </motion.div>
+      </div>
+      <div className="grid place-items-center px-6 py-16">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }} className="w-full max-w-[360px]">
+          <LogoMark className="size-10 lg:hidden" />
+          <h1 className="mt-6 font-serif text-[38px] leading-tight tracking-tight text-ink lg:mt-0">Accedi</h1>
+          <p className="mt-2 text-[14px] text-muted">Area riservata allo studio.</p>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              login.mutate();
+            }}
+            className="mt-12 space-y-8"
+          >
+            <Field label="Email">
+              <Input type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} className="!h-11 text-[15px]" />
+            </Field>
+            <Field label="Password">
+              <Input type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} className="!h-11 text-[15px]" />
+            </Field>
+            {login.error && <p className="text-[13px] text-bad">{(login.error as Error).message}</p>}
+            <Button type="submit" variant="primary" size="lg" loading={login.isPending} iconRight={!login.isPending ? <ArrowRight className="size-4" /> : undefined}>
+              Entra
+            </Button>
+          </form>
+          <p className="mt-20 text-[11.5px] text-faint">Dati dal Portale delle Vendite Pubbliche, Ministero della Giustizia.</p>
+        </motion.div>
+      </div>
     </div>
   );
 }

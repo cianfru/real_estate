@@ -1,20 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Pencil, Plus, Trash2, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Page } from "@/components/AppShell";
-import { Badge, Button, Card, Empty, Field, IconButton, Input, Spinner, Textarea, cx } from "@/components/ui";
+import { Button, Card, Empty, Field, Input, Spinner, Textarea, cx } from "@/components/ui";
 import { api, del, post, put } from "@/lib/api";
 import { date, eur } from "@/lib/format";
 import { label, useMeta } from "@/lib/hooks";
 import type { Cliente } from "@/lib/types";
 
-const TONE: Record<string, "neutral" | "gold" | "ok" | "bad"> = {
-  in_valutazione: "neutral",
-  offerta_presentata: "gold",
-  aggiudicato: "ok",
-  scartato: "bad",
+const TONE: Record<string, string> = {
+  in_valutazione: "text-muted",
+  offerta_presentata: "font-medium text-gold",
+  aggiudicato: "font-medium text-ok",
+  scartato: "text-faint",
 };
 
 export default function Clienti() {
@@ -39,7 +38,7 @@ export default function Clienti() {
       title="Clienti"
       subtitle="Solo un nome interno e note libere. Nessun dato fiscale."
       actions={
-        <Button variant="primary" icon={<Plus className="size-4" />} onClick={() => setEditing("new")}>
+        <Button variant="gold" onClick={() => setEditing("new")}>
           Nuovo cliente
         </Button>
       }
@@ -47,47 +46,48 @@ export default function Clienti() {
       {isLoading ? (
         <Spinner />
       ) : !data?.length ? (
-        <Card>
-          <Empty icon={<Users className="size-5" />} title="Nessun cliente">
-            Crea un cliente qui o collegalo direttamente dalla scheda di un immobile.
-          </Empty>
-        </Card>
+        <Empty title="Nessun cliente">Crea un cliente qui o collegalo direttamente dalla scheda di un immobile.</Empty>
       ) : (
-        <div className="grid gap-5 lg:grid-cols-[300px_1fr]">
-          <Card className="h-fit p-2">
+        <div className="grid gap-14 lg:grid-cols-[260px_1fr]">
+          <nav className="h-fit">
             {data.map((c) => (
               <button
                 key={c.id}
                 onClick={() => setParams({ id: String(c.id) })}
                 className={cx(
-                  "flex w-full cursor-pointer items-center justify-between rounded-xl px-3.5 py-3 text-left transition-colors",
-                  c.id === selected ? "bg-surface-2" : "hover:bg-surface-2/60",
+                  "relative flex w-full cursor-pointer items-baseline justify-between py-2.5 pl-4 text-left transition-colors",
+                  c.id === selected ? "font-semibold text-ink" : "text-muted hover:text-ink",
                 )}
               >
-                <span className="truncate text-[14px] font-medium text-ink">{c.display_name}</span>
-                <span className="num text-[12px] text-faint">{c.lotti.length}</span>
+                <span className={cx("absolute top-2.5 bottom-2.5 left-0 w-[2px]", c.id === selected ? "bg-gold" : "bg-transparent")} />
+                <span className="truncate text-[14.5px]">{c.display_name}</span>
+                <span className="num text-[12px] font-normal text-faint">{c.lotti.length}</span>
               </button>
             ))}
-          </Card>
+          </nav>
           {current && (
             <motion.div key={current.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-              <Card className="p-7">
+              <div>
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h2 className="font-serif text-[28px] leading-tight text-ink">{current.display_name}</h2>
+                    <h2 className="font-serif text-[34px] leading-tight text-ink">{current.display_name}</h2>
                     <p className="mt-1 text-[12.5px] text-faint">Cliente dal {date(current.created_at)}</p>
                   </div>
-                  <div className="flex gap-1">
-                    <IconButton label="Modifica" icon={<Pencil className="size-4" />} onClick={() => setEditing(current)} />
-                    <IconButton
-                      label="Elimina"
-                      icon={<Trash2 className="size-4" />}
+                  <div className="flex gap-6">
+                    <Button size="sm" variant="secondary" onClick={() => setEditing(current)}>
+                      Modifica
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
                       onClick={() => confirm(`Eliminare ${current.display_name}? I collegamenti agli immobili verranno rimossi.`) && remove.mutate(current.id)}
-                    />
+                    >
+                      Elimina
+                    </Button>
                   </div>
                 </div>
-                {current.notes && <p className="mt-4 whitespace-pre-line rounded-2xl bg-surface-2/70 p-4 text-[14px] text-ink/90">{current.notes}</p>}
-                <h3 className="mt-8 mb-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-faint">Immobili collegati</h3>
+                {current.notes && <p className="mt-5 max-w-[65ch] whitespace-pre-line font-serif text-[16px] leading-relaxed text-ink/85">{current.notes}</p>}
+                <h3 className="mt-12 mb-3 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-faint">Immobili collegati</h3>
                 {current.lotti.length === 0 ? (
                   <p className="text-[13.5px] text-muted">Nessun immobile. Collegali dalla scheda dell'immobile.</p>
                 ) : (
@@ -101,12 +101,12 @@ export default function Clienti() {
                           </p>
                         </div>
                         <p className="num text-[14px] font-semibold text-ink">{eur(l.prezzo_base)}</p>
-                        <Badge tone={TONE[l.status] ?? "neutral"}>{label(meta?.cliente_status, l.status)}</Badge>
+                        <span className={cx("w-36 text-right text-[12.5px]", TONE[l.status] ?? "text-muted")}>{label(meta?.cliente_status, l.status)}</span>
                       </Link>
                     ))}
                   </div>
                 )}
-              </Card>
+              </div>
             </motion.div>
           )}
         </div>
@@ -135,12 +135,12 @@ function ClienteDialog({ cliente, onClose, onSaved }: { cliente: Cliente | null;
     },
   });
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/30 p-4 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/25 p-4 backdrop-blur-sm" onClick={onClose}>
       <motion.div initial={{ scale: 0.96, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="w-full max-w-md" onClick={(e) => e.stopPropagation()}>
-        <Card className="p-7 shadow-float">
-          <h2 className="font-serif text-[24px] text-ink">{cliente ? "Modifica cliente" : "Nuovo cliente"}</h2>
+        <Card className="p-9 shadow-float">
+          <h2 className="font-serif text-[28px] text-ink">{cliente ? "Modifica cliente" : "Nuovo cliente"}</h2>
           <form
-            className="mt-5 space-y-4"
+            className="mt-7 space-y-7"
             onSubmit={(e) => {
               e.preventDefault();
               if (name.trim()) save.mutate();
@@ -152,7 +152,7 @@ function ClienteDialog({ cliente, onClose, onSaved }: { cliente: Cliente | null;
             <Field label="Note">
               <Textarea rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Budget, zone di interesse, esigenze…" />
             </Field>
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-end gap-8">
               <Button type="button" variant="ghost" onClick={onClose}>
                 Annulla
               </Button>

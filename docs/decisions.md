@@ -22,6 +22,12 @@
 | D16 | First sync is a silent bootstrap; `first_seen` = PVP publication date | otherwise the first alert digest would list 17,000 lots and "new in 7 days" would be meaningless |
 | D17 | Sales without a court grouped under pseudo-tribunale `ESATTORIALE` | ~275 tax-collector auctions have no `codiceTribunale` |
 | D18 | Geocoding tries free text, then structured street + city, then the street without number, then the comune centroid | PVP addresses carry noise ("n.civ presunto", "lotto 2E", several streets) |
+| D19 | Interface without pills, chips, outlined buttons or boxed badges: text actions, a gold underline for the selection, dot toggles, underline-only inputs, small-caps status text, serif headings | the firm's direction: "super clean, extremely elegant, no pills" |
+| D20 | Zone value = median first-round price per m² (the court expert's appraisal) over six years, by segment, in ≈2 km hexagons → comune → ≈8 km hexagons → province, leave-one-out | the only free, national, geolocated valuation source we have; see market-analysis.md |
+| D21 | Opportunity = ≥ 35% below the zone's appraisals **and** ≥ 25% below the zone's auction prices, own appraisal 0.6–1.6× the zone, never at province level, never land or partial ownership | a single threshold flagged ~30% of lots, mostly ordinary later rounds |
+| D22 | Market history (`storico_vendite`) from search pages only, ≈ 500 requests one-off, then from the nightly list | details for 250k sales would take days of PVP traffic |
+| D23 | PVP's 2025 coverage hole is detected from the data; first sales in the 12 months after it are not used as appraisals and the index shows a gap | otherwise reduced rounds read as low appraisals and fake a −39% trend |
+| D24 | Price index = rolling 12-month median per quarter, ≥ 3 own and ≥ 8 window observations, never across a gap | provinces have 20–40 priced sales a quarter; raw quarters are noise |
 
 ## Known limitations
 
@@ -32,6 +38,10 @@
   add a running cost and needs the firm's OK.
 - The national backlog of ~6,700 lots without coordinates drains at `GEOCODE_LIMIT` (800) per
   night, Veneto first.
+- **Zone values describe the auction market**, not open-market listing prices, and many surfaces
+  are read from the description text. See `market-analysis.md` "Limitations".
+- **No recent appraisals until early 2027**, because of PVP's 2025 coverage hole (D23). Zone values
+  rest on 2020–2025 appraisals; the 12-month trend stays hidden until then.
 
 ## Pending (need the firm's input)
 
@@ -58,7 +68,7 @@ Fill this in when the screenshots arrive. ✅ = we have it, ❓ = check whether 
 | Modalità di vendita | ✅ | ❓ | |
 | Delegato / custode | behind flag | ❓ | |
 | Siti di pubblicità | ✅ | ❓ | |
-| Valori OMI (€/m² di zona) | ❌ | ❓ | later: Agenzia Entrate OMI open data |
+| Valore di zona €/m² | ✅ from court appraisals (market-analysis.md) | ❓ | OMI open data would add an open-market reference |
 | Link Formaps / mappe catastali | ❌ | ❓ | |
 | Abusi / difformità, spese condominiali, vincoli | ❌ | ❓ | later: LLM extraction from the perizia, manual trigger |
 

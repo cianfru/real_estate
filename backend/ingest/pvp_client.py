@@ -144,16 +144,18 @@ class PvpClient:
     def iter_upcoming(self, filters: dict[str, Any], today_iso: str) -> Iterator[dict[str, Any]]:
         """All sales with dataVendita >= today. PVP has no 'upcoming' filter (filtroAnnunci=1
         only covers ~60 days), so we sort by sale date descending and stop at the first past one."""
-        page = 0
-        while True:
+        return self.iter_since(filters, today_iso)
+
+    def iter_since(self, filters: dict[str, Any], since_iso: str, max_pages: int = 2000) -> Iterator[dict[str, Any]]:
+        """Every sale with dataVendita >= since_iso, newest first (also used for the history backfill)."""
+        for page in range(max_pages):
             body = self.search_page(filters, page, self.settings.pvp_page_size)
             for item in body["content"]:
-                if (item.get("dataVendita") or "") < today_iso:
+                if (item.get("dataVendita") or "") < since_iso:
                     return
                 yield item
             if body["last"] or not body["content"]:
                 return
-            page += 1
 
     def iter_all(self, filters: dict[str, Any], max_pages: int = 10) -> Iterator[dict[str, Any]]:
         """Every sale matching the filters, past ones included (used for round history)."""

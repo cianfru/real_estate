@@ -9,6 +9,7 @@ const LottoPage = lazy(() => import("@/pages/LottoPage"));
 const SavedSearches = lazy(() => import("@/pages/SavedSearches"));
 const Clienti = lazy(() => import("@/pages/Clienti"));
 const Admin = lazy(() => import("@/pages/Admin"));
+const Mercato = lazy(() => import("@/pages/Mercato"));
 const PublicShare = lazy(() => import("@/pages/PublicShare"));
 
 function Loading() {
@@ -35,6 +36,7 @@ export default function App() {
         <Route path="/s/:token" element={<PublicShare />} />
         <Route path="/" element={<RequireAuth><Explore /></RequireAuth>} />
         <Route path="/lotti/:id" element={<RequireAuth><LottoPage /></RequireAuth>} />
+        <Route path="/mercato" element={<RequireAuth><Mercato /></RequireAuth>} />
         <Route path="/ricerche" element={<RequireAuth><SavedSearches /></RequireAuth>} />
         <Route path="/clienti" element={<RequireAuth><Clienti /></RequireAuth>} />
         <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />

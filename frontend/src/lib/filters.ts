@@ -1,6 +1,15 @@
 // The filter state mirrors backend `LottoFilters`; it lives in the URL so every view is linkable.
 
-export type SortKey = "data_vendita" | "termine" | "prezzo_asc" | "prezzo_desc" | "ribasso" | "nuovi" | "superficie";
+export type SortKey =
+  | "data_vendita"
+  | "termine"
+  | "prezzo_asc"
+  | "prezzo_desc"
+  | "ribasso"
+  | "nuovi"
+  | "superficie"
+  | "opportunita"
+  | "eur_mq";
 
 export interface Filters {
   q?: string;
@@ -22,6 +31,9 @@ export interface Filters {
   new_days?: number;
   price_dropped?: boolean;
   min_rounds?: number;
+  opportunity?: boolean;
+  segment: string[];
+  min_sconto_zona?: number;
   polygon?: GeoJSON.Polygon;
 }
 
@@ -33,6 +45,8 @@ export const SORTS: Record<SortKey, string> = {
   ribasso: "Ribasso maggiore",
   nuovi: "Più recenti",
   superficie: "Superficie",
+  opportunita: "Sconto sulla zona",
+  eur_mq: "Prezzo al m²",
 };
 
 export const emptyFilters = (): Filters => ({
@@ -42,13 +56,14 @@ export const emptyFilters = (): Filters => ({
   tipologia: [],
   occupazione: [],
   modalita: [],
+  segment: [],
   status: ["active"],
 });
 
-const LISTS = ["tribunale", "provincia", "category", "tipologia", "occupazione", "modalita", "status"] as const;
-const NUMS = ["price_min", "price_max", "surface_min", "surface_max", "new_days", "min_rounds"] as const;
+const LISTS = ["tribunale", "provincia", "category", "tipologia", "occupazione", "modalita", "segment", "status"] as const;
+const NUMS = ["price_min", "price_max", "surface_min", "surface_max", "new_days", "min_rounds", "min_sconto_zona"] as const;
 const STRS = ["q", "comune", "deadline_from", "deadline_to"] as const;
-const BOOLS = ["has_coords", "price_dropped"] as const;
+const BOOLS = ["has_coords", "price_dropped", "opportunity"] as const;
 
 /** Query string for the API (repeated keys for lists). */
 export function toQuery(f: Filters, extra: Record<string, string | number | undefined> = {}): string {

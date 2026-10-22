@@ -44,6 +44,9 @@ def _migrate() -> None:
 
 
 TABLES = (
+    "area_stats",
+    "price_index",
+    "storico_vendite",
     "alert_log",
     "share_links",
     "note",

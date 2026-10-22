@@ -1,7 +1,7 @@
 # Notes for Claude Code
 
 Internal judicial-auction tool for the Legal Estate law firm, built on the PVP public API.
-Read `README.md` and `docs/` (pvp-api, data-model, decisions, runbook) before changing anything,
+Read `README.md` and `docs/` (pvp-api, data-model, market-analysis, decisions, runbook) before changing anything,
 and keep them current.
 
 ## Hard rules
@@ -16,9 +16,13 @@ and keep them current.
 ## Commands
 - Backend: `cd backend && .venv/bin/pytest -q && .venv/bin/ruff check . && .venv/bin/mypy app ingest`
 - Frontend: `cd frontend && npm run typecheck && npm test && npm run build`
-- Ingest: `python -m ingest sync --scope veneto|italy`, `detail <pvp_id>`, `geocode`, `alerts`, `nightly`
+- Ingest: `python -m ingest sync --scope veneto|italy`, `detail <pvp_id>`, `geocode`, `history`, `analytics`, `alerts`, `nightly`
 
 ## Where things live
 - Filters: `schemas.LottoFilters` ↔ `services/lotti_query.apply_filters` ↔ `frontend/src/lib/filters.ts`
 - Lot identity and events: `ingest/sync.py` (see docs/data-model.md "Lot identity")
 - Property card: `frontend/src/components/LottoCard.tsx` + `LottoParts.tsx`
+- Zone values, price index, opportunities: `ingest/analytics.py` (method in docs/market-analysis.md);
+  page `frontend/src/pages/Mercato.tsx`, charts `components/charts.tsx`
+- Design language: no pills, chips, outlined buttons or boxed badges (decisions.md D19). Use the
+  primitives in `frontend/src/components/ui.tsx`.

@@ -83,6 +83,16 @@ The search payload is a Spring `Page`: `content[]`, `totalElements`, `totalPages
 - **Sales without a court.** ~275 upcoming sales (Agenzia Entrate-Riscossione, "esecuzioni
   esattoriali") have empty `codiceTribunale`/`tribunale` and `procedura.codUfficio = null`. We file
   them under the pseudo-tribunale `ESATTORIALE` ("Vendite esattoriali (senza tribunale)").
+- **Coverage hole, March 2025 – January 2026.** Paging the full history (sorted by
+  `dataOraVendita,desc`) jumps from January 2026 to February 2025 within a single page: PVP
+  returns ~1% of the usual volume for those months (nationally 125 sales dated March 2025, 16 in
+  April, 4 in May, 1 in June, none July–October, 51 in November, 126 in December, against
+  3,000–8,000 in a normal month). Publications dated December 2024 – June 2025 are also almost
+  absent. Probably a migration on PVP's side; the rest of the history (2019 →) is complete. The
+  market analysis detects such months and treats them as blind (`market-analysis.md`).
+- **No structured surface in search results**, and in the detail only per bene
+  (`beni[].superficie`, `"198 mq"`). For national market data the surface is read from `descLotto`
+  (`ingest.valuation.extract_surface`).
 - Several lots of the same procedure often share the exact same coordinates (same building).
   The map layer fans duplicates out on a ~25 m ring so each stays clickable.
 - Filtering by `"Tribunale di VICENZA"` also matches the ex-Bassano court (substring match);
@@ -210,7 +220,14 @@ few dozen afterwards; round history ≈ one search per procedure, refreshed ever
 detail, 487 provisional keys confirmed, 12 rows skipped for impossible sale dates.
 39 % of national lots have no PVP coordinates (Veneto: 30 %).
 
-## 8. Fixtures
+## 8. Market history backfill (22/10/2026)
+
+`python -m ingest history --scope italy --since 2019-01-01`: 506 search requests (page size 500),
+251,798 sales from January 2019, 0 errors. One more surprise on the way: `procedura` is free text
+on some old sales and can exceed 20 characters (e.g. several RGE numbers joined), so
+`rge_numero` is 60 characters and `norm_rge` truncates.
+
+## 9. Fixtures
 
 `backend/tests/fixtures/pvp/` holds real responses recorded on 22/10/2026, anonymised: every
 `soggetti` entry has placeholder names/phones/emails and every tax code is replaced with the

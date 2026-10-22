@@ -1,10 +1,9 @@
-import { motion } from "framer-motion";
-import { Building2, Factory, Home, Store, Trophy, TrendingDown } from "lucide-react";
+import { Building2, Factory, Home, Store, Trophy } from "lucide-react";
 import { apiUrl } from "@/lib/api";
 import type { LottoListItem } from "@/lib/types";
 import { countdown, date, eur, mq } from "@/lib/format";
 import { CATEGORY_COLORS } from "./MapView";
-import { Badge, cx } from "./ui";
+import { cx } from "./ui";
 
 export function CategoryIcon({ category, className }: { category: string | null; className?: string }) {
   const Icon =
@@ -23,12 +22,9 @@ export function CategoryIcon({ category, className }: { category: string | null;
 export function Thumb({ url, category, className }: { url: string | null; category: string | null; className?: string }) {
   const color = CATEGORY_COLORS[category ?? ""] ?? CATEGORY_COLORS.ALTRA_CATEGORIA;
   return (
-    <div
-      className={cx("relative overflow-hidden rounded-xl bg-surface-2", className)}
-      style={{ backgroundImage: `linear-gradient(135deg, ${color}22, ${color}08)` }}
-    >
+    <div className={cx("relative overflow-hidden rounded-md bg-surface-2", className)} style={{ backgroundColor: `${color}12` }}>
       <div className="absolute inset-0 grid place-items-center" style={{ color }}>
-        <CategoryIcon category={category} className="size-6 opacity-70" />
+        <CategoryIcon category={category} className="size-5 opacity-60" />
       </div>
       {url && (
         <img
@@ -76,45 +72,38 @@ export function LottoRow({
   now: Date;
 }) {
   return (
-    <motion.button
+    <button
       type="button"
       onMouseEnter={() => onHover(lot.id)}
       onMouseLeave={() => onHover(null)}
       onClick={onClick}
-      whileTap={{ scale: 0.99 }}
-      className={cx(
-        "group flex w-full cursor-pointer gap-3 rounded-2xl p-2.5 text-left transition-colors",
-        selected ? "bg-gold-soft" : active ? "bg-surface-2" : "hover:bg-surface-2",
-      )}
+      className="group relative flex w-full cursor-pointer gap-4 py-4 pr-2 pl-5 text-left"
     >
-      <Thumb url={lot.cover_url} category={lot.category} className="size-[76px] shrink-0" />
+      <span className={cx("absolute top-4 bottom-4 left-0 w-[2px] transition-colors", selected ? "bg-gold" : active ? "bg-line-strong" : "bg-transparent")} />
+      <Thumb url={lot.cover_url} category={lot.category} className="size-[72px] shrink-0" />
       <div className="min-w-0 flex-1">
-        <div className="flex items-start justify-between gap-2">
-          <p className="truncate font-serif text-[15.5px] leading-tight text-ink">{lot.titolo}</p>
-          <p className="num shrink-0 text-[15px] font-semibold text-ink">{eur(lot.prezzo_base)}</p>
+        <div className="flex items-baseline justify-between gap-3">
+          <p className={cx("truncate font-serif text-[16px] leading-tight transition-colors", selected ? "text-gold" : "text-ink group-hover:text-ink")}>{lot.titolo}</p>
+          <p className="num shrink-0 text-[15px] font-medium text-ink">{eur(lot.prezzo_base)}</p>
         </div>
-        <p className="mt-0.5 truncate text-[12.5px] text-muted">
-          {lot.indirizzo || lot.comune || "Indirizzo non indicato"}
-        </p>
-        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11.5px]">
-          <span className="text-faint">
+        <p className="mt-1 truncate text-[12.5px] text-muted">{lot.indirizzo || lot.comune || "Indirizzo non indicato"}</p>
+        <p className="mt-1.5 flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 text-[11.5px] text-faint">
+          <span>
             {lot.tribunale.short_name}
-            {lot.rge ? ` · ${lot.rge}` : ""}
+            {lot.rge ? ` ${lot.rge}` : ""}
           </span>
-          {lot.superficie_mq ? <span className="num text-faint">{mq(lot.superficie_mq)}</span> : null}
-          {lot.ribasso_pct ? (
-            <Badge tone="ok">
-              <TrendingDown className="size-3" />
-              <span className="num">−{Math.round(lot.ribasso_pct)}%</span>
-            </Badge>
+          {lot.superficie_mq ? <span className="num">{mq(lot.superficie_mq)}</span> : null}
+          {lot.n_rounds > 1 && <span>{lot.n_rounds} esperimenti</span>}
+          {lot.ribasso_pct ? <span className="num text-ok">−{Math.round(lot.ribasso_pct)}%</span> : null}
+          {lot.opportunity && lot.sconto_zona_pct ? (
+            <span className="num font-semibold text-gold">−{Math.round(lot.sconto_zona_pct)}% sulla zona</span>
           ) : null}
-          {lot.n_rounds > 1 && <Badge>{lot.n_rounds} esperimenti</Badge>}
-          {lot.approx && <Badge tone="warn">pos. approssimativa</Badge>}
-        </div>
-        <div className="mt-1 text-[11.5px]">
+          {lot.approx && <span className="text-warn">posizione approssimativa</span>}
+        </p>
+        <p className="mt-1 text-[11.5px]">
           <DeadlinePill deadline={lot.termine_offerte} sale={lot.data_vendita} now={now} />
-        </div>
+        </p>
       </div>
-    </motion.button>
+    </button>
   );
 }

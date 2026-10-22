@@ -38,6 +38,14 @@ class Settings(BaseSettings):
     nominatim_email: str = ""
     geocode_limit: int = 800
 
+    # Market analysis (see docs/market-analysis.md)
+    hex_size_m: float = 1200.0  # zone hexagon, centre to corner (≈ 2 km across)
+    analytics_years: int = 6  # appraisals older than this are not used for zone values
+    # opportunity = current €/m² at least X% below the zone's appraised value AND at least Y% below
+    # what auctions in the same zone typically ask (calibrated on the live data, docs/market-analysis.md)
+    opportunity_threshold_pct: float = 35.0
+    opportunity_auction_pct: float = 25.0
+
     # Email (Resend). Without a key, emails are logged instead of sent.
     resend_api_key: str = ""
     email_from: str = "Legal Estate Aste <aste@legalestateitalia.it>"

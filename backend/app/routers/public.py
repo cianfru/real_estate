@@ -58,4 +58,8 @@ def public_lotto(token: str, db: Session = Depends(get_db)) -> PublicLotto:
         allegati=documents(lot),
         pvp_url=d.pvp_url if cur else None,
         expires_at=s.expires_at,
+        eur_mq=d.eur_mq,
+        eur_mq_stima=d.eur_mq_stima,
+        sconto_zona_pct=d.sconto_zona_pct,
+        zona=d.zona,
     )

@@ -69,6 +69,12 @@ def apply_filters(q: Select[Any], f: LottoFilters) -> Select[Any]:
         conds.append(Lotto.prezzo_base < Lotto.prezzo_primo_esperimento)
     if f.min_rounds:
         conds.append(Lotto.n_rounds >= f.min_rounds)
+    if f.opportunity:
+        conds.append(Lotto.opportunity.is_(True))
+    if f.segment:
+        conds.append(Lotto.segment.in_(f.segment))
+    if f.min_sconto_zona is not None:
+        conds.append(Lotto.sconto_zona_pct >= f.min_sconto_zona)
     if f.bbox:
         w, s, e, n = (float(x) for x in f.bbox.split(","))
         conds.append(func.ST_Intersects(GEOM, func.ST_MakeEnvelope(w, s, e, n, 4326)))
@@ -96,6 +102,8 @@ def apply_sort(q: Select[Any], sort: SortKey) -> Select[Any]:
         "ribasso": [RIBASSO.desc().nulls_last()],
         "nuovi": [Lotto.first_seen.desc()],
         "superficie": [Lotto.superficie_mq.desc().nulls_last()],
+        "opportunita": [Lotto.opportunity.desc(), Lotto.sconto_zona_pct.desc().nulls_last()],
+        "eur_mq": [Lotto.eur_mq.asc().nulls_last()],
     }
     return q.order_by(*orders[sort], Lotto.id)
 
@@ -158,6 +166,10 @@ def to_list_item(lot: Lotto, lat: float | None, lon: float | None, ribasso: Any)
         first_seen=lot.first_seen,
         cover_url=cover_url(lot),
         has_detail=lot.has_detail,
+        segment=lot.segment,
+        eur_mq=float(lot.eur_mq) if lot.eur_mq is not None else None,
+        sconto_zona_pct=lot.sconto_zona_pct,
+        opportunity=lot.opportunity,
     )
 
 
@@ -182,6 +194,8 @@ def geojson(db: Session, f: LottoFilters, limit: int = 20000) -> dict[str, Any]:
             Lotto.subtype,
             Lotto.comune,
             Lotto.data_vendita,
+            Lotto.opportunity,
+            Lotto.sconto_zona_pct,
         ).where(Lotto.geom.is_not(None)),
         f,
     ).limit(limit)
@@ -212,6 +226,8 @@ def geojson(db: Session, f: LottoFilters, limit: int = 20000) -> dict[str, Any]:
                     "a": 1 if approx else 0,
                     "t": tipologia_label(r.subtype),
                     "m": r.comune,
+                    "o": 1 if r.opportunity else 0,
+                    "s": r.sconto_zona_pct,
                 },
             }
         )

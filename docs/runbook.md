@@ -45,7 +45,11 @@ set the repo variable `NIGHTLY_ON_GITHUB=true`) and host the API on any free con
 6. **First sync.** Admin page → "Avvia sincronizzazione" (Italia), or
    `railway run python -m ingest sync --scope italy`. It takes ~20 minutes (≈ 1,000 PVP
    requests). The first sync is a silent *bootstrap*: no events, no alert emails.
-7. **Resend.** Verify the sending domain (`legalestateitalia.it`) in Resend, then set
+7. **Market history.** Once, after the first sync:
+   `railway run python -m ingest history --scope italy --since 2019-01-01` (≈ 500 PVP requests,
+   about 10 minutes), then `python -m ingest analytics` (≈ 20 s). The Mercato page and the zone
+   layer stay empty until this has run. The first analytics run is silent (no opportunity events).
+8. **Resend.** Verify the sending domain (`legalestateitalia.it`) in Resend, then set
    `RESEND_API_KEY` and `EMAIL_FROM`. Without a key, alerts are written to the log.
 
 ## Daily operation
@@ -56,7 +60,10 @@ The nightly job does, in order:
    Veneto sales, round history for new Veneto procedures, outcomes of recently concluded sales,
    unseen-lot marking.
 2. `geocode`: up to `GEOCODE_LIMIT` lots without coordinates, Veneto first.
-3. `alerts`: one digest per user for that run's `new_lot`, `new_round`, `price_drop` events.
+3. `analytics`: zone values, price index and opportunities from `storico_vendite`
+   (`docs/market-analysis.md`), ≈ 20 s, no PVP requests.
+4. `alerts`: one digest per user for that run's `new_lot`, `new_round`, `price_drop` and
+   `opportunity` events.
 
 Every step writes a row in `ingest_runs`, visible on the **Admin** page with counts and errors.
 
@@ -69,6 +76,9 @@ Every step writes a row in `ingest_runs`, visible on the **Admin** page with cou
 | refresh one sale | card → ⟳ button, or `python -m ingest detail <pvp_id>` |
 | enrich another court | Admin page → "Attiva un altro tribunale", or `python -m ingest tribunali --activate 0280600097` |
 | geocode now | `python -m ingest geocode --limit 300` |
+| recompute zone values and opportunities | `python -m ingest analytics` |
+| reload market history | `python -m ingest history --scope italy --since 2019-01-01` (idempotent upsert) |
+| change the opportunity thresholds | set `OPPORTUNITY_THRESHOLD_PCT` / `OPPORTUNITY_AUCTION_PCT` on the cron service, then run `analytics` |
 | resend today's alerts | `python -m ingest alerts --run-id <sync run id>` (already-sent events are skipped) |
 | reset a password | `python -m ingest create-user <email> "<name>"` again |
 | disable a user | `UPDATE users SET is_active = false WHERE email = '...';` |

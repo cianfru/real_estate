@@ -3,8 +3,10 @@
 sync --scope veneto|italy [--no-details]   list sync (+ details for active tribunali)
 detail <pvp_id>                            fetch one sale's details now
 geocode [--limit N]                        geocode lots without coordinates
+history [--scope italy] [--since DATE]     load the market history (search pages only)
+analytics                                  zone values, price index, opportunities
 alerts [--run-id N]                        send saved-search digests
-nightly [--scope italy] [--no-alerts]      sync + geocode + alerts (what the cron runs)
+nightly [--scope italy] [--no-alerts]      sync + geocode + analytics + alerts (what the cron runs)
 tribunali [--activate CODE] [--deactivate CODE]
 create-user EMAIL NAME [--admin]           password is prompted (or $LE_PASSWORD)
 """
@@ -31,6 +33,10 @@ def main(argv: list[str] | None = None) -> int:
     d.add_argument("pvp_id", type=int)
     g = sub.add_parser("geocode")
     g.add_argument("--limit", type=int)
+    h = sub.add_parser("history")
+    h.add_argument("--scope", choices=["veneto", "italy"], default="italy")
+    h.add_argument("--since", default="2019-01-01")
+    sub.add_parser("analytics")
     a = sub.add_parser("alerts")
     a.add_argument("--run-id", type=int)
     n = sub.add_parser("nightly")
@@ -51,6 +57,12 @@ def main(argv: list[str] | None = None) -> int:
         jobs.sync(args.scope, with_details=not args.no_details)
     elif args.cmd == "geocode":
         jobs.geocode(args.limit)
+    elif args.cmd == "history":
+        from datetime import date
+
+        jobs.history(args.scope, date.fromisoformat(args.since))
+    elif args.cmd == "analytics":
+        jobs.analytics()
     elif args.cmd == "alerts":
         jobs.alerts(args.run_id)
     elif args.cmd == "nightly":

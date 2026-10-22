@@ -1,17 +1,7 @@
 // Building blocks of the property card, shared by the staff card and the public share page.
+// Typographic: figures and labels on the page, separated by whitespace and the odd hairline.
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  ArrowUpRight,
-  CalendarClock,
-  FileImage,
-  FileText,
-  Gavel,
-  Layers,
-  Map as MapIcon,
-  Ruler,
-  ScrollText,
-  TrendingDown,
-} from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import maplibregl from "maplibre-gl";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { apiUrl } from "@/lib/api";
@@ -19,7 +9,7 @@ import type { Allegato, Meta, Round } from "@/lib/types";
 import { bytes, countdown, date, dateLong, dateTime, eur, mq, pct } from "@/lib/format";
 import { label, useNow, useTheme } from "@/lib/hooks";
 import { CATEGORY_COLORS } from "./MapView";
-import { Badge, SectionTitle, cx } from "./ui";
+import { SectionTitle, cx } from "./ui";
 
 export interface CardFacts {
   prezzo_base: number | null;
@@ -36,32 +26,12 @@ export interface CardFacts {
   deposito_cauzionale: string | null;
 }
 
-function Stat({
-  label: l,
-  value,
-  sub,
-  className,
-  big,
-  hero,
-}: {
-  label: string;
-  value: ReactNode;
-  sub?: ReactNode;
-  className?: string;
-  big?: boolean;
-  hero?: boolean;
-}) {
+function Figure({ label: l, value, sub, tone }: { label: string; value: ReactNode; sub?: ReactNode; tone?: "ok" | "bad" }) {
   return (
-    <div
-      className={cx(
-        "rounded-2xl p-4",
-        hero ? "bg-[#0b263b] text-[#f6f5f2] dark:bg-[#1c2a37]" : "bg-surface-2/70 text-ink",
-        className,
-      )}
-    >
-      <p className={cx("text-[11.5px] font-medium", hero ? "text-[#f6f5f2]/70" : "text-muted")}>{l}</p>
-      <p className={cx("num mt-1 font-semibold tracking-tight", big ? "text-[28px] leading-none" : "text-[17px]")}>{value}</p>
-      {sub && <div className={cx("mt-1.5 text-[12px]", hero ? "text-[#f6f5f2]/75" : "text-muted")}>{sub}</div>}
+    <div>
+      <p className="text-[10.5px] font-semibold uppercase tracking-[0.12em] text-faint">{l}</p>
+      <p className={cx("num mt-1.5 text-[19px] font-medium tracking-tight", tone === "ok" ? "text-ok" : tone === "bad" ? "text-bad" : "text-ink")}>{value}</p>
+      {sub && <p className="mt-0.5 text-[12px] leading-snug text-muted">{sub}</p>}
     </div>
   );
 }
@@ -72,81 +42,66 @@ export function KeyFigures({ d, meta }: { d: CardFacts; meta: Meta | undefined }
   const c = countdown(deadline, now);
   const sconto = d.sconto_stima_pct ?? (d.valore_stima && d.prezzo_base ? (1 - d.prezzo_base / d.valore_stima) * 100 : null);
   return (
-    <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-      <Stat
-        big
-        hero
-        className="col-span-2"
-        label="Prezzo base"
-        value={eur(d.prezzo_base)}
-        sub={
-          <span className="flex flex-wrap gap-x-3 gap-y-1">
+    <div>
+      <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-6">
+        <div>
+          <p className="text-[10.5px] font-semibold uppercase tracking-[0.12em] text-faint">Prezzo base</p>
+          <p className="num mt-1 text-[44px] font-light leading-none tracking-[-0.02em] text-ink">{eur(d.prezzo_base)}</p>
+          <p className="mt-2.5 text-[13px] text-muted">
             {d.offerta_minima ? (
-              <span>
-                Offerta minima <b className="num font-semibold">{eur(d.offerta_minima)}</b>
-              </span>
+              <>
+                Offerta minima <span className="num text-ink">{eur(d.offerta_minima)}</span>
+              </>
             ) : null}
             {d.rialzo_minimo ? (
-              <span>
-                Rilancio <b className="num font-semibold">{eur(d.rialzo_minimo)}</b>
-              </span>
+              <>
+                <span className="mx-2 text-faint">·</span>Rilancio <span className="num text-ink">{eur(d.rialzo_minimo)}</span>
+              </>
             ) : null}
-          </span>
-        }
-      />
-      <div
-        className={cx(
-          "col-span-2 rounded-2xl p-4",
-          c?.urgent ? "bg-bad/10" : "bg-surface-2/70",
-        )}
-      >
-        <p className="flex items-center gap-1.5 text-[11.5px] font-medium text-muted">
-          <CalendarClock className="size-3.5" /> {d.termine_offerte ? "Termine offerte" : "Data vendita"}
-        </p>
-        {c && !c.past ? (
-          <p className={cx("num mt-1 text-[28px] font-semibold leading-none tracking-tight", c.urgent ? "text-bad" : "text-ink")}>
-            {c.days > 0 ? (
-              <>
-                {c.days}
-                <span className="text-[15px] font-medium text-muted"> g </span>
-                {c.hours}
-                <span className="text-[15px] font-medium text-muted"> h</span>
-              </>
-            ) : (
-              <>
-                {c.hours}
-                <span className="text-[15px] font-medium text-muted"> h </span>
-                {c.minutes}
-                <span className="text-[15px] font-medium text-muted"> m</span>
-              </>
-            )}
           </p>
-        ) : (
-          <p className="mt-1 text-[17px] font-semibold text-muted">Scaduto</p>
-        )}
-        <p className="mt-1.5 text-[12px] text-muted">{dateTime(deadline)}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-[10.5px] font-semibold uppercase tracking-[0.12em] text-faint">{d.termine_offerte ? "Termine offerte" : "Data vendita"}</p>
+          {c && !c.past ? (
+            <p className={cx("num mt-1 text-[44px] font-light leading-none tracking-[-0.02em]", c.urgent ? "text-bad" : "text-ink")}>
+              {c.days > 0 ? (
+                <>
+                  {c.days}
+                  <span className="text-[17px] text-muted"> g </span>
+                  {c.hours}
+                  <span className="text-[17px] text-muted"> h</span>
+                </>
+              ) : (
+                <>
+                  {c.hours}
+                  <span className="text-[17px] text-muted"> h </span>
+                  {c.minutes}
+                  <span className="text-[17px] text-muted"> m</span>
+                </>
+              )}
+            </p>
+          ) : (
+            <p className="mt-1 text-[24px] font-light leading-none text-muted">Scaduto</p>
+          )}
+          <p className="mt-2.5 text-[13px] text-muted">{dateTime(deadline)}</p>
+        </div>
       </div>
-      <Stat
-        label="Valore di stima"
-        value={d.valore_stima ? eur(d.valore_stima) : "—"}
-        sub={sconto ? <span className="text-ok">−{pct(sconto)} vs stima</span> : <span className="text-faint">non indicato su PVP</span>}
-      />
-      <Stat
-        label="Ribasso"
-        value={d.ribasso_pct ? <span className="text-ok">−{pct(d.ribasso_pct)}</span> : "—"}
-        sub={d.prezzo_primo_esperimento ? <>dal 1° esperimento ({eur(d.prezzo_primo_esperimento)})</> : "primo esperimento"}
-      />
-      <Stat label="€/m²" value={d.prezzo_mq ? eur(d.prezzo_mq) : "—"} sub="sul prezzo base" />
-      <Stat
-        label="Vendita"
-        value={<span className="text-[15px]">{label(meta?.modalita, d.modalita)}</span>}
-        sub={d.data_vendita ? dateLong(d.data_vendita) : undefined}
-      />
-      {d.deposito_cauzionale && (
-        <p className="col-span-2 px-1 text-[12px] text-muted sm:col-span-4">
-          Cauzione: <span className="text-ink">{d.deposito_cauzionale}</span>
-        </p>
-      )}
+      <div className="mt-8 grid grid-cols-2 gap-x-8 gap-y-6 border-t border-line pt-6 sm:grid-cols-4">
+        <Figure
+          label="Valore di stima"
+          value={d.valore_stima ? eur(d.valore_stima) : "—"}
+          sub={sconto ? <span className="text-ok">−{pct(sconto)} sulla stima</span> : "non indicato su PVP"}
+        />
+        <Figure
+          label="Ribasso"
+          tone={d.ribasso_pct ? "ok" : undefined}
+          value={d.ribasso_pct ? `−${pct(d.ribasso_pct)}` : "—"}
+          sub={d.prezzo_primo_esperimento && d.ribasso_pct ? <>dal 1° esperimento, {eur(d.prezzo_primo_esperimento)}</> : "primo esperimento"}
+        />
+        <Figure label="Prezzo al m²" value={d.prezzo_mq ? eur(d.prezzo_mq) : "—"} sub="sul prezzo base" />
+        <Figure label="Vendita" value={<span className="text-[15px]">{label(meta?.modalita, d.modalita)}</span>} sub={d.data_vendita ? dateLong(d.data_vendita) : undefined} />
+      </div>
+      {d.deposito_cauzionale && <p className="mt-5 text-[12.5px] text-muted">Cauzione {d.deposito_cauzionale}</p>}
     </div>
   );
 }
@@ -158,53 +113,44 @@ export function RoundTimeline({ rounds, meta }: { rounds: Round[]; meta: Meta | 
   return (
     <section>
       <SectionTitle>Storico esperimenti</SectionTitle>
-      <ol className="relative space-y-1">
+      <ol>
         {ordered.map((r, i) => (
           <motion.li
             key={r.id}
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.04 }}
-            className={cx("relative grid grid-cols-[22px_1fr] gap-3 rounded-xl px-2 py-2", r.is_current && "bg-gold-soft")}
+            className="grid grid-cols-[18px_1fr] gap-4 py-3"
           >
             <div className="relative flex justify-center">
-              <span
-                className={cx(
-                  "relative z-10 mt-1 size-3 rounded-full ring-4 ring-surface",
-                  r.is_current ? "bg-gold" : r.esito === "AGGIU" ? "bg-ok" : "bg-line-strong",
-                )}
-              />
-              {i < ordered.length - 1 && <span className="absolute top-4 bottom-[-12px] w-px bg-line-strong" />}
+              <span className={cx("relative z-10 mt-[7px] size-2 rounded-full", r.is_current ? "bg-gold" : r.esito === "AGGIU" ? "bg-ok" : "bg-faint")} />
+              {i < ordered.length - 1 && <span className="absolute top-5 bottom-[-20px] w-px bg-line-strong" />}
             </div>
             <div className="min-w-0">
-              <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-                <p className="text-[13px] font-medium text-ink">
-                  {r.round_number ? `${r.round_number}° esperimento` : "Esperimento"} · <span className="num">{date(r.data_vendita)}</span>
+              <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+                <p className={cx("text-[14px]", r.is_current ? "font-semibold text-ink" : "text-ink/85")}>
+                  {r.round_number ? `${r.round_number}° esperimento` : "Esperimento"}
+                  <span className="num ml-2 font-normal text-muted">{date(r.data_vendita)}</span>
                 </p>
-                <p className="num text-[14px] font-semibold text-ink">{eur(r.prezzo_base)}</p>
+                <p className={cx("num text-[15px]", r.is_current ? "font-semibold text-ink" : "text-ink/85")}>{eur(r.prezzo_base)}</p>
               </div>
-              <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-surface-2">
+              <div className="mt-2 h-px bg-line">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${((r.prezzo_base ?? 0) / max) * 100}%` }}
-                  transition={{ duration: 0.6, delay: 0.1 + i * 0.04, ease: [0.22, 1, 0.36, 1] }}
-                  className={cx("h-full rounded-full", r.is_current ? "bg-gold" : "bg-navy/30")}
+                  transition={{ duration: 0.7, delay: 0.1 + i * 0.04, ease: [0.22, 1, 0.36, 1] }}
+                  className={cx("h-[2px] -translate-y-[0.5px]", r.is_current ? "bg-gold" : "bg-navy/35")}
                 />
               </div>
-              <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11.5px]">
-                {r.drop_pct ? (
-                  <Badge tone="ok">
-                    <TrendingDown className="size-3" />
-                    <span className="num">−{pct(r.drop_pct, 1)}</span>
-                  </Badge>
-                ) : null}
-                {r.esito && <Badge tone={r.esito === "AGGIU" ? "ok" : "neutral"}>{label(meta?.esiti, r.esito)}</Badge>}
-                {r.is_current && <Badge tone="gold">In corso</Badge>}
+              <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-muted">
+                {r.drop_pct ? <span className="num text-ok">−{pct(r.drop_pct, 1)}</span> : null}
+                {r.is_current && <span className="font-medium text-gold">In corso</span>}
+                {r.esito && <span className={r.esito === "AGGIU" ? "text-ok" : ""}>{label(meta?.esiti, r.esito)}</span>}
                 {r.modalita && <span className="text-faint">{label(meta?.modalita, r.modalita)}</span>}
-                <a href={r.pvp_url} target="_blank" rel="noreferrer" className="ml-auto inline-flex items-center gap-0.5 text-faint hover:text-gold">
+                <a href={r.pvp_url} target="_blank" rel="noreferrer" className="ml-auto inline-flex items-center gap-0.5 text-faint transition-colors hover:text-gold">
                   PVP <ArrowUpRight className="size-3" />
                 </a>
-              </div>
+              </p>
             </div>
           </motion.li>
         ))}
@@ -213,19 +159,15 @@ export function RoundTimeline({ rounds, meta }: { rounds: Round[]; meta: Meta | 
   );
 }
 
-export function DetailsGrid({
-  items,
-}: {
-  items: [string, ReactNode][];
-}) {
+export function DetailsGrid({ items }: { items: [string, ReactNode][] }) {
   return (
-    <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3">
+    <dl className="grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-3">
       {items
         .filter(([, v]) => v !== null && v !== undefined && v !== "" && v !== "—")
         .map(([k, v]) => (
           <div key={k}>
-            <dt className="text-[11.5px] text-muted">{k}</dt>
-            <dd className="num mt-0.5 text-[13.5px] text-ink">{v}</dd>
+            <dt className="text-[10.5px] font-semibold uppercase tracking-[0.12em] text-faint">{k}</dt>
+            <dd className="num mt-1 text-[14px] text-ink">{v}</dd>
           </div>
         ))}
     </dl>
@@ -238,9 +180,9 @@ export function Description({ text }: { text: string | null }) {
   const long = text.length > 420;
   return (
     <div>
-      <p className={cx("whitespace-pre-line text-[14px] leading-relaxed text-ink/90", !open && long && "line-clamp-5")}>{text}</p>
+      <p className={cx("max-w-[68ch] whitespace-pre-line font-serif text-[16px] leading-[1.65] text-ink/90", !open && long && "line-clamp-5")}>{text}</p>
       {long && (
-        <button onClick={() => setOpen(!open)} className="mt-1 cursor-pointer text-[13px] font-medium text-gold">
+        <button onClick={() => setOpen(!open)} className="mt-2 cursor-pointer text-[13px] font-medium text-gold">
           {open ? "Mostra meno" : "Leggi tutto"}
         </button>
       )}
@@ -251,14 +193,15 @@ export function Description({ text }: { text: string | null }) {
 export function Catastali({ rows }: { rows: Record<string, string | number>[] | null }) {
   if (!rows?.length) return null;
   const cols = ["sezione", "foglio", "particella", "subalterno", "graffato"].filter((c) => rows.some((r) => r[c]));
+  const multi = rows.some((r) => Number(r.bene) > 1);
   return (
-    <div className="overflow-x-auto rounded-xl hairline">
-      <table className="num w-full text-[12.5px]">
-        <thead className="bg-surface-2/70 text-left text-muted">
+    <div className="overflow-x-auto">
+      <table className="num w-full text-[13px]">
+        <thead className="text-left">
           <tr>
-            {rows.some((r) => Number(r.bene) > 1) && <th className="px-3 py-2 font-medium">Bene</th>}
+            {multi && <th className="pb-2 pr-6 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-faint">Bene</th>}
             {cols.map((c) => (
-              <th key={c} className="px-3 py-2 font-medium capitalize">
+              <th key={c} className="pb-2 pr-6 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-faint">
                 {c}
               </th>
             ))}
@@ -267,9 +210,9 @@ export function Catastali({ rows }: { rows: Record<string, string | number>[] | 
         <tbody>
           {rows.map((r, i) => (
             <tr key={i} className="border-t border-line">
-              {rows.some((x) => Number(x.bene) > 1) && <td className="px-3 py-2">{r.bene}</td>}
+              {multi && <td className="py-2 pr-6 text-muted">{r.bene}</td>}
               {cols.map((c) => (
-                <td key={c} className="px-3 py-2 text-ink">
+                <td key={c} className="py-2 pr-6 text-ink">
                   {r[c] ?? ""}
                 </td>
               ))}
@@ -300,19 +243,22 @@ export function Gallery({ docs }: { docs: Allegato[] }) {
   const current = open !== null ? photos[open] : undefined;
   return (
     <>
-      <div className="scroll-thin -mx-1 flex snap-x gap-2 overflow-x-auto px-1 pb-1">
+      <div className="scroll-thin flex snap-x gap-1.5 overflow-x-auto pb-1">
         {photos.map((p, i) => (
-          <motion.button
+          <button
             key={p.id}
             type="button"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
             onClick={() => setOpen(i)}
-            className="relative h-36 w-52 shrink-0 cursor-zoom-in snap-start overflow-hidden rounded-xl bg-surface-2"
+            className="group relative h-40 w-60 shrink-0 cursor-zoom-in snap-start overflow-hidden rounded-md bg-surface-2"
             aria-label={`Foto ${i + 1}`}
           >
-            <img src={apiUrl(p.image_url ?? null) ?? undefined} alt="" loading="lazy" className="size-full object-cover" />
-          </motion.button>
+            <img
+              src={apiUrl(p.image_url ?? null) ?? undefined}
+              alt=""
+              loading="lazy"
+              className="size-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+            />
+          </button>
         ))}
       </div>
       <AnimatePresence>
@@ -322,18 +268,18 @@ export function Gallery({ docs }: { docs: Allegato[] }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setOpen(null)}
-            className="fixed inset-0 z-[60] grid cursor-zoom-out place-items-center bg-black/85 p-4 backdrop-blur-sm"
+            className="fixed inset-0 z-[60] grid cursor-zoom-out place-items-center bg-black/88 p-4 backdrop-blur-sm"
           >
             <motion.img
               key={current.id}
-              initial={{ scale: 0.97, opacity: 0 }}
+              initial={{ scale: 0.98, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               src={apiUrl(current.image_url ?? null) ?? undefined}
               alt=""
-              className="max-h-[88vh] max-w-[92vw] rounded-2xl object-contain shadow-float"
+              className="max-h-[88vh] max-w-[92vw] rounded-md object-contain"
             />
-            <p className="absolute bottom-5 text-[12.5px] text-white/70">
-              {(open ?? 0) + 1} / {photos.length} · ← → per scorrere
+            <p className="num absolute bottom-6 text-[12px] tracking-wide text-white/60">
+              {(open ?? 0) + 1} / {photos.length}
             </p>
           </motion.div>
         )}
@@ -347,32 +293,18 @@ export function Documents({ docs, meta }: { docs: Allegato[]; meta: Meta | undef
   if (!docs.length) return null;
   const sorted = [...docs].sort((a, b) => DOC_ORDER.indexOf(a.tipo) - DOC_ORDER.indexOf(b.tipo));
   return (
-    <div className="grid gap-1.5 sm:grid-cols-2">
-      {sorted.map((a) => {
-        const Icon = a.tipo === "foto" ? FileImage : a.tipo === "planimetria" ? MapIcon : a.tipo === "perizia" ? ScrollText : a.tipo === "ordinanza" ? Gavel : FileText;
-        return (
-          <motion.a
-            key={a.id}
-            href={a.url}
-            target="_blank"
-            rel="noreferrer"
-            whileHover={{ scale: 1.01 }}
-            className="flex items-center gap-3 rounded-xl bg-surface-2/70 px-3 py-2.5 transition-colors hover:bg-surface-2"
-          >
-            <span className={cx("grid size-9 shrink-0 place-items-center rounded-lg", a.tipo === "perizia" ? "bg-gold-soft text-gold" : "bg-surface text-muted")}>
-              <Icon className="size-4" />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-[13px] font-medium text-ink">{label(meta?.allegati, a.tipo)}</span>
-              <span className="block truncate text-[11.5px] text-faint">
-                {a.descrizione || a.filename} {a.size ? `· ${bytes(a.size)}` : ""}
-              </span>
-            </span>
-            <ArrowUpRight className="size-4 shrink-0 text-faint" />
-          </motion.a>
-        );
-      })}
-    </div>
+    <ul className="divide-y divide-line">
+      {sorted.map((a) => (
+        <li key={a.id}>
+          <a href={a.url} target="_blank" rel="noreferrer" className="group flex items-baseline gap-4 py-3">
+            <span className={cx("w-28 shrink-0 text-[13.5px] font-medium", a.tipo === "perizia" ? "text-gold" : "text-ink")}>{label(meta?.allegati, a.tipo)}</span>
+            <span className="min-w-0 flex-1 truncate text-[13px] text-muted group-hover:text-ink">{a.descrizione || a.filename}</span>
+            <span className="num shrink-0 text-[12px] text-faint">{bytes(a.size)}</span>
+            <ArrowUpRight className="size-3.5 shrink-0 self-center text-faint transition-colors group-hover:text-gold" />
+          </a>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -393,12 +325,12 @@ export function MiniMap({ lat, lon, category, approx, className }: { lat: number
     const color = CATEGORY_COLORS[category ?? ""] ?? CATEGORY_COLORS.ALTRA_CATEGORIA;
     const dot = document.createElement("div");
     dot.style.cssText = approx
-      ? `width:64px;height:64px;border-radius:50%;background:${color}22;border:2px dashed ${color}`
-      : `width:18px;height:18px;border-radius:50%;background:${color};border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25)`;
+      ? `width:64px;height:64px;border-radius:50%;background:${color}1f`
+      : `width:14px;height:14px;border-radius:50%;background:${color};box-shadow:0 0 0 4px ${color}33`;
     new maplibregl.Marker({ element: dot }).setLngLat([lon, lat]).addTo(map);
     return () => map.remove();
   }, [lat, lon, category, approx, theme]);
-  return <div ref={el} className={cx("overflow-hidden rounded-2xl", className)} />;
+  return <div ref={el} className={cx("overflow-hidden rounded-md", className)} />;
 }
 
 export function PropertyFacts({
@@ -420,12 +352,12 @@ export function PropertyFacts({
   return (
     <DetailsGrid
       items={[
-        ["Superficie", d.superficie_mq ? <span className="inline-flex items-center gap-1"><Ruler className="size-3.5 text-faint" />{mq(d.superficie_mq)}</span> : null],
+        ["Superficie", d.superficie_mq ? mq(d.superficie_mq) : null],
         ["Vani", d.vani ? String(d.vani).replace(".", ",") : null],
         ["Piano", d.piano],
         ["Occupazione", d.occupazione ? label(meta?.occupazione, d.occupazione) : null],
         ["Categoria", d.category ? label(meta?.categorie, d.category) : null],
-        ["Tipologia", d.tipologia ? <span className="inline-flex items-center gap-1"><Layers className="size-3.5 text-faint" />{meta?.tipologie[d.tipologia] ?? label(undefined, d.tipologia)}</span> : null],
+        ["Tipologia", d.tipologia ? (meta?.tipologie[d.tipologia] ?? label(undefined, d.tipologia)) : null],
         ["Procedura", d.tipo_procedura ?? null],
         ["Tipo vendita", d.tipo_vendita ? label(meta?.tipo_vendita, d.tipo_vendita) : null],
       ]}

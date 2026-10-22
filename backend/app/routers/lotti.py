@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.auth import current_user
@@ -27,6 +27,7 @@ from app.models import (
 from app.schemas import (
     AllegatoOut,
     ClienteLinkOut,
+    ComparableOut,
     ContattoOut,
     EventoOut,
     LottiPage,
@@ -39,6 +40,7 @@ from app.schemas import (
     ShareLinkOut,
     SortKey,
     VenditaOut,
+    ZonaOut,
 )
 from app.services import lotti_query as lq
 
@@ -67,6 +69,9 @@ def filters_from_query(
     new_days: int | None = None,
     price_dropped: bool | None = None,
     min_rounds: int | None = None,
+    opportunity: bool | None = None,
+    segment: list[str] = Query(default=[]),
+    min_sconto_zona: float | None = None,
 ) -> LottoFilters:
     try:
         poly = json.loads(polygon) if polygon else None
@@ -92,6 +97,9 @@ def filters_from_query(
             new_days=new_days,
             price_dropped=price_dropped,
             min_rounds=min_rounds,
+            opportunity=opportunity,
+            segment=segment,
+            min_sconto_zona=min_sconto_zona,
         )
     except (ValueError, json.JSONDecodeError) as e:
         raise HTTPException(422, f"Filtro non valido: {e}") from e
@@ -284,7 +292,64 @@ def build_detail(db: Session, lot: Lotto) -> LottoDetail:
             for s in shares
         ],
         detail_fetched_at=cur.fetched_at if cur else None,
+        eur_mq_stima=float(lot.eur_mq_stima) if lot.eur_mq_stima is not None else None,
+        sconto_aste_pct=lot.sconto_aste_pct,
+        superficie_source=lot.superficie_source,
+        quota_parziale=lot.quota_parziale,
+        zona=zona_out(lot),
+        comparables=comparables(db, lot),
     )
+
+
+def zona_out(lot: Lotto) -> ZonaOut | None:
+    if lot.zona_eur_mq is None or lot.zona_level is None or lot.zona_key is None:
+        return None
+    return ZonaOut(
+        level=lot.zona_level,
+        key=lot.zona_key,
+        label=lot.zona_label,
+        n=lot.zona_n or 0,
+        eur_mq=float(lot.zona_eur_mq),
+        p25=float(lot.zona_p25) if lot.zona_p25 is not None else None,
+        p75=float(lot.zona_p75) if lot.zona_p75 is not None else None,
+        asta_eur_mq=float(lot.zona_asta_eur_mq) if lot.zona_asta_eur_mq is not None else None,
+    )
+
+
+def comparables(db: Session, lot: Lotto, radius_m: int = 8000, limit: int = 6) -> list[ComparableOut]:
+    """Nearest lots of the same segment with a price per m² (auctions in progress first)."""
+    if lot.geom is None or lot.segment is None:
+        return []
+    dist = func.ST_Distance(Lotto.geom, select(Lotto.geom).where(Lotto.id == lot.id).scalar_subquery())
+    rows = db.execute(
+        select(Lotto, dist.label("d"))
+        .where(
+            Lotto.id != lot.id,
+            Lotto.merged_into_id.is_(None),
+            Lotto.segment == lot.segment,
+            Lotto.eur_mq.is_not(None),
+            Lotto.geom.is_not(None),
+            func.ST_DWithin(Lotto.geom, select(Lotto.geom).where(Lotto.id == lot.id).scalar_subquery(), radius_m),
+        )
+        .order_by((Lotto.status != "active"), dist)
+        .limit(limit)
+    ).all()
+    return [
+        ComparableOut(
+            id=c.id,
+            titolo=lq.titolo(c),
+            comune=c.comune,
+            eur_mq=float(c.eur_mq),
+            prezzo_base=float(c.prezzo_base) if c.prezzo_base is not None else None,
+            superficie_mq=c.superficie_mq,
+            sconto_zona_pct=c.sconto_zona_pct,
+            distance_km=round(float(d) / 1000, 1),
+            status=c.status,
+            data_vendita=c.data_vendita,
+            opportunity=c.opportunity,
+        )
+        for c, d in rows
+    ]
 
 
 @router.get("/{lotto_id}", response_model=LottoDetail)

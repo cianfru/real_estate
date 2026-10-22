@@ -9,6 +9,7 @@ from app.auth import current_user
 from app.config import get_settings
 from app.db import get_db
 from app.models import IngestRun, Lotto, Tribunale
+from ingest.valuation import SEGMENTS
 
 router = APIRouter(prefix="/meta", tags=["meta"], dependencies=[Depends(current_user)])
 
@@ -47,6 +48,7 @@ def meta(db: Session = Depends(get_db)) -> dict[str, Any]:
     return {
         "tribunali": tribunali,
         "categorie": labels.CATEGORIE,
+        "segmenti": SEGMENTS,
         "tipologie": {
             c: labels.tipologia_label(c) for c in sorted(tipologie_in_use, key=lambda c: labels.tipologia_label(c) or c)
         },

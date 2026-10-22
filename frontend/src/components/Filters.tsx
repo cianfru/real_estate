@@ -1,9 +1,8 @@
-import { RotateCcw } from "lucide-react";
 import type { ReactNode } from "react";
 import type { Filters as F } from "@/lib/filters";
 import { emptyFilters } from "@/lib/filters";
 import type { Meta } from "@/lib/types";
-import { Button, Chip, Field, Input, Select, Toggle } from "./ui";
+import { Button, Chip, Field, Input, OptionRow, Select } from "./ui";
 
 function toggle<T>(list: T[], v: T): T[] {
   return list.includes(v) ? list.filter((x) => x !== v) : [...list, v];
@@ -16,8 +15,8 @@ function num(v: string): number | undefined {
 
 function Group({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="space-y-2">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-faint">{title}</p>
+    <div className="space-y-2.5">
+      <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-faint">{title}</p>
       {children}
     </div>
   );
@@ -37,9 +36,9 @@ export function FiltersPanel({ f, set, meta }: { f: F; set: (f: F) => void; meta
   const otherSelected = f.tribunale.filter((id) => others.some((t) => t.id === id));
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-7">
       <Group title="Tribunale">
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-x-5 gap-y-1">
           {enriched.map((t) => (
             <Chip key={t.id} active={f.tribunale.includes(t.id)} onClick={() => upd({ tribunale: toggle(f.tribunale, t.id) })}>
               {t.short_name}
@@ -64,7 +63,7 @@ export function FiltersPanel({ f, set, meta }: { f: F; set: (f: F) => void; meta
           </Select>
         )}
         {otherSelected.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-x-5 gap-y-1">
             {otherSelected.map((id) => (
               <Chip key={id} active onClick={() => upd({ tribunale: f.tribunale.filter((x) => x !== id) })}>
                 {others.find((t) => t.id === id)?.short_name} ×
@@ -75,7 +74,7 @@ export function FiltersPanel({ f, set, meta }: { f: F; set: (f: F) => void; meta
       </Group>
 
       <Group title="Categoria">
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-x-5 gap-y-1">
           {Object.entries(meta?.categorie ?? {}).map(([k, v]) => (
             <Chip key={k} active={f.category.includes(k)} onClick={() => upd({ category: toggle(f.category, k) })}>
               {v}
@@ -97,7 +96,7 @@ export function FiltersPanel({ f, set, meta }: { f: F; set: (f: F) => void; meta
             ))}
         </Select>
         {f.tipologia.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-x-5 gap-y-1">
             {f.tipologia.map((k) => (
               <Chip key={k} active onClick={() => upd({ tipologia: f.tipologia.filter((x) => x !== k) })}>
                 {meta?.tipologie[k] ?? k} ×
@@ -108,7 +107,7 @@ export function FiltersPanel({ f, set, meta }: { f: F; set: (f: F) => void; meta
       </Group>
 
       <Group title="Prezzo base">
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-x-5 gap-y-1">
           {PRICE_PRESETS.map(([l, a, b]) => (
             <Chip
               key={l}
@@ -121,13 +120,13 @@ export function FiltersPanel({ f, set, meta }: { f: F; set: (f: F) => void; meta
             </Chip>
           ))}
         </div>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-6">
           <Input inputMode="numeric" placeholder="Min €" value={f.price_min ?? ""} onChange={(e) => upd({ price_min: num(e.target.value) })} />
           <Input inputMode="numeric" placeholder="Max €" value={f.price_max ?? ""} onChange={(e) => upd({ price_max: num(e.target.value) })} />
         </div>
       </Group>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-6">
         <Field label="Superficie min (m²)">
           <Input inputMode="numeric" value={f.surface_min ?? ""} onChange={(e) => upd({ surface_min: num(e.target.value) })} />
         </Field>
@@ -137,14 +136,14 @@ export function FiltersPanel({ f, set, meta }: { f: F; set: (f: F) => void; meta
       </div>
 
       <Group title="Scadenza offerte">
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-6">
           <Input type="date" aria-label="dal" value={f.deadline_from ?? ""} onChange={(e) => upd({ deadline_from: e.target.value || undefined })} />
           <Input type="date" aria-label="al" value={f.deadline_to ?? ""} onChange={(e) => upd({ deadline_to: e.target.value || undefined })} />
         </div>
       </Group>
 
       <Group title="Occupazione">
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-x-5 gap-y-1">
           {Object.entries(meta?.occupazione ?? {})
             .filter(([k]) => k !== "NON_SPECIFICATA")
             .map(([k, v]) => (
@@ -156,7 +155,7 @@ export function FiltersPanel({ f, set, meta }: { f: F; set: (f: F) => void; meta
       </Group>
 
       <Group title="Modalità di vendita">
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-x-5 gap-y-1">
           {Object.entries(meta?.modalita ?? {})
             .filter(([k]) => k !== "VENDPDO")
             .map(([k, v]) => (
@@ -167,11 +166,12 @@ export function FiltersPanel({ f, set, meta }: { f: F; set: (f: F) => void; meta
         </div>
       </Group>
 
-      <div className="divide-y divide-line rounded-2xl bg-surface-2/60">
+      <div>
         {(
           [
+            ["Solo opportunità", "Sotto il valore medio della zona", !!f.opportunity, (v: boolean) => upd({ opportunity: v || undefined })],
             ["Solo con ribasso", "Prezzo sceso rispetto al primo esperimento", !!f.price_dropped, (v: boolean) => upd({ price_dropped: v || undefined })],
-            ["Nuovi ultimi 7 giorni", "Comparsi su PVP nell'ultima settimana", f.new_days === 7, (v: boolean) => upd({ new_days: v ? 7 : undefined })],
+            ["Nuovi ultimi 7 giorni", "Pubblicati su PVP nell'ultima settimana", f.new_days === 7, (v: boolean) => upd({ new_days: v ? 7 : undefined })],
             ["Solo con posizione", "Esclude gli immobili non localizzati", !!f.has_coords, (v: boolean) => upd({ has_coords: v || undefined })],
             [
               "Includi conclusi",
@@ -181,17 +181,11 @@ export function FiltersPanel({ f, set, meta }: { f: F; set: (f: F) => void; meta
             ],
           ] as [string, string, boolean, (v: boolean) => void][]
         ).map(([title, hint, val, on]) => (
-          <label key={title} className="flex cursor-pointer items-center justify-between gap-3 px-3.5 py-3">
-            <span>
-              <span className="block text-[13px] font-medium text-ink">{title}</span>
-              <span className="block text-[11.5px] text-faint">{hint}</span>
-            </span>
-            <Toggle checked={val} onChange={on} label={title} />
-          </label>
+          <OptionRow key={title} title={title} hint={hint} checked={val} onChange={on} />
         ))}
       </div>
 
-      <Button variant="ghost" size="sm" icon={<RotateCcw className="size-3.5" />} onClick={() => set({ ...emptyFilters(), q: f.q })}>
+      <Button variant="ghost" size="sm" onClick={() => set({ ...emptyFilters(), q: f.q })}>
         Azzera filtri
       </Button>
     </div>

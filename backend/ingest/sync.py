@@ -30,6 +30,7 @@ from app.models import (
     Tribunale,
     Vendita,
 )
+from ingest.history import upsert_storico
 from ingest.mapping import (
     ROME,
     DetailRow,
@@ -44,6 +45,7 @@ from ingest.pvp_client import PvpClient, PvpError, SchemaDriftError
 log = logging.getLogger("ingest.sync")
 
 ESITO_SOLD = "AGGIU"
+HISTORY_DAYS = 30
 
 
 def now_utc() -> datetime:
@@ -161,15 +163,20 @@ class Syncer:
             filter_sets = [{"tipoLotto": "IMMOBILI"}]
         else:
             filter_sets = [{"tipoLotto": "IMMOBILI", "tribunale": t.name} for t in self.active_tribunali()]
+        # Also read the last HISTORY_DAYS of past sales: they only feed the market history
+        # (outcomes, recent prices), they are not upserted as lots.
+        since = today - timedelta(days=HISTORY_DAYS)
         seen: set[int] = set()
+        history: list[ListRow] = []
         for filters in filter_sets:
-            for item in self.client.iter_upcoming(filters, today.isoformat()):
+            for item in self.client.iter_since(filters, since.isoformat()):
                 if (item.get("dataVendita") or "9999") > horizon.isoformat():
                     # PVP contains typos like year 3019; they would sort first forever.
                     self.counts["skipped_bad_date"] += 1
                     continue
                 row = parse_list_item(item)
-                if row.pvp_id in seen:
+                history.append(row)
+                if (item.get("dataVendita") or "") < today.isoformat() or row.pvp_id in seen:
                     continue
                 seen.add(row.pvp_id)
                 self.upsert_from_list(row)
@@ -177,6 +184,7 @@ class Syncer:
                 if len(seen) % 500 == 0:
                     self.db.commit()
                     log.info("list sync: %d rows", len(seen))
+        self.counts["storico_rows"] += upsert_storico(self.db, history)
         self.db.commit()
         return seen
 
@@ -333,6 +341,12 @@ class Syncer:
         put("descrizione", row.descrizione)
         put("occupazione", row.occupazione)
         put("cover_image_path", row.cover_image)
+        put("segment", row.segment)
+        if row.superficie and lot.superficie_source != "pvp":
+            lot.superficie_mq = row.superficie
+            lot.superficie_source = "testo"
+        if overwrite:
+            lot.quota_parziale = row.quota_parziale
         if row.lat is not None and (lot.geom is None or lot.geocode_source in ("comune", None)):
             lot.geom = _point(row.lat, row.lon)
             lot.geocode_source = "pvp"
@@ -509,6 +523,10 @@ class Syncer:
                 setattr(lot, attr, val)
         if d.categorie_bene:
             lot.categorie_bene = d.categorie_bene
+        lot.segment = d.segment
+        lot.quota_parziale = d.quota_parziale
+        if d.superficie_source:
+            lot.superficie_source = d.superficie_source
         if d.dati_catastali:
             lot.dati_catastali = d.dati_catastali
         if d.lat is not None:
@@ -656,6 +674,7 @@ class Syncer:
                     # past rounds are history; an upcoming one we had not seen is real news
                     past = row.data_vendita is not None and row.data_vendita < _start_of_today()
                     self.upsert_from_list(row, anno=anno, quiet=past)
+                    upsert_storico(self.db, [row])
                     self.counts["history_rows"] += 1
                 now = now_utc()
                 for lot in plots:

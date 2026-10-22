@@ -21,7 +21,7 @@ from app.services.lotti_query import apply_filters, titolo
 
 log = logging.getLogger("app.alerts")
 
-ALERT_EVENT_TYPES = ("new_lot", "new_round", "price_drop")
+ALERT_EVENT_TYPES = ("new_lot", "new_round", "price_drop", "opportunity")
 
 
 def _eur(v: Any) -> str:
@@ -34,11 +34,14 @@ def _when(dt: datetime | None) -> str:
     return dt.strftime("%d/%m/%Y") if dt else "—"
 
 
-def run_alerts(db: Session, since: datetime | None = None, run_id: int | None = None) -> dict[str, int]:
+def run_alerts(
+    db: Session, since: datetime | None = None, run_id: int | None = None, run_ids: list[int] | None = None
+) -> dict[str, int]:
     since = since or datetime.now(UTC) - timedelta(days=2)
     q = select(Evento).where(Evento.tipo.in_(ALERT_EVENT_TYPES), Evento.at >= since)
-    if run_id is not None:
-        q = q.where(Evento.run_id == run_id)
+    ids = [*(run_ids or []), *([run_id] if run_id is not None else [])]
+    if ids:
+        q = q.where(Evento.run_id.in_(ids))
     events = list(db.scalars(q))
     counts = {"events": len(events), "emails": 0, "items": 0}
     if not events:
