@@ -1,0 +1,316 @@
+{
+ "messaggio": "Operazione effettuata con successo",
+ "body": {
+  "content": [
+   {
+    "id": 4649210,
+    "tipoLotto": "IMMOBILI",
+    "categoriaLotto": "ALTRA_CATEGORIA",
+    "categoriaBene": [
+     "MAGAZZINO"
+    ],
+    "indirizzo": {
+     "via": "Via Colotti 2",
+     "numeroCivico": "",
+     "cap": "35133",
+     "citta": "Padova",
+     "provincia": "Padova",
+     "coordinate": {
+      "latitudine": 45.433029,
+      "longitudine": 11.894389
+     },
+     "codNazione": null,
+     "codRegione": null,
+     "codProvincia": null,
+     "codComune": null,
+     "idIndirizzo": null,
+     "descComune": null,
+     "descProvincia": null,
+     "descRegione": null,
+     "descNazione": null,
+     "comuneEstero": null
+    },
+    "numeroLotto": "LOTTO UNICO",
+    "procedura": "229",
+    "prezzoBaseAsta": 29000.0,
+    "dataVendita": "2027-02-17",
+    "orarioVendita": "18:00",
+    "dataOraVendita": "2027-02-17T18:00",
+    "dataPubblicazione": "2026-10-21",
+    "immagine": null,
+    "immagineCover": null,
+    "offertaMinima": 21750.0,
+    "rialzoMinimo": 1000.0,
+    "disponibilita": [
+     "OCCUP"
+    ],
+    "descLotto": "Locale ad uso magazzino posto al piano terra, all’interno di una palazzina residenziale sviluppata su più piani. Attualmente si trova composto da ingresso con portone finestrato, servizio, ampio lo...",
+    "descLottoDE": null,
+    "tribunale": "Tribunale di PADOVA",
+    "codiceTribunale": "0280600097",
+    "esito": null
+   },
+   {
+    "id": 4649259,
+    "tipoLotto": "IMMOBILI",
+    "categoriaLotto": "IMMOBILE_RESIDENZIALE",
+    "categoriaBene": [
+     "APPARTAMENTO"
+    ],
+    "indirizzo": {
+     "via": "Via A. Canova 17",
+     "numeroCivico": "",
+     "cap": "35027",
+     "citta": "Noventa Padovana",
+     "provincia": "Padova",
+     "coordinate": null,
+     "codNazione": null,
+     "codRegione": null,
+     "codProvincia": null,
+     "codComune": null,
+     "idIndirizzo": null,
+     "descComune": null,
+     "descProvincia": null,
+     "descRegione": null,
+     "descNazione": null,
+     "comuneEstero": null
+    },
+    "numeroLotto": "1",
+    "procedura": "53",
+    "prezzoBaseAsta": 81800.0,
+    "dataVendita": "2027-02-17",
+    "orarioVendita": "17:00",
+    "dataOraVendita": "2027-02-17T17:00",
+    "dataPubblicazione": "2026-10-21",
+    "immagine": null,
+    "immagineCover": null,
+    "offertaMinima": 61350.0,
+    "rialzoMinimo": 1000.0,
+    "disponibilita": [
+     "OCCUP"
+    ],
+    "descLotto": "Appartamento al piano primo facenti parte del condominio “Condominio Borgo Cellini 2”. L’unità si compone di soggiorno-pranzo-cottura, disimpegno, camera matrimoniale, bagno e terrazzo. Al piano in...",
+    "descLottoDE": null,
+    "tribunale": "Tribunale di PADOVA",
+    "codiceTribunale": "0280600097",
+    "esito": null
+   },
+   {
+    "id": 4637283,
+    "tipoLotto": "IMMOBILI",
+    "categoriaLotto": "IMMOBILE_RESIDENZIALE",
+    "categoriaBene": [
+     "ABITAZIONE_TIPO_CIV",
+     "TERRENO"
+    ],
+    "indirizzo": {
+     "via": "Via Municipio, 35010 Campodoro PD, Italia",
+     "numeroCivico": "",
+     "cap": null,
+     "citta": "Campodoro",
+     "provincia": "Padova",
+     "coordinate": {
+      "latitudine": 45.493492,
+      "longitudine": 11.750825
+     },
+     "codNazione": null,
+     "codRegione": null,
+     "codProvincia": null,
+     "codComune": null,
+     "idIndirizzo": null,
+     "descComune": null,
+     "descProvincia": null,
+     "descRegione": null,
+     "descNazione": null,
+     "comuneEstero": null
+    },
+    "numeroLotto": "LOTTO UNICO",
+    "procedura": "284",
+    "prezzoBaseAsta": 104000.0,
+    "dataVendita": "2027-02-02",
+    "orarioVendita": "10:00",
+    "dataOraVendita": "2027-02-02T10:00",
+    "dataPubblicazione": "2026-09-28",
+    "immagine": null,
+    "immagineCover": null,
+    "offertaMinima": 78000.0,
+    "rialzoMinimo": 1000.0,
+    "disponibilita": [
+     "OCCUP"
+    ],
+    "descLotto": "porzione di fabbricato bifamiliare sviluppata al piano terra e al piano seminterrato (quest’ultimo destinato a box auto) di un fabbricato che si eleva per due piani fuori terra oltre al piano seminterrato.Il compendio immobiliare in esame risulta edificato su un lotto di terreno avente conformazione planimetrica rettangolare e superficie pertinenziale pari a circa mq 340,00.",
+    "descLottoDE": null,
+    "tribunale": "Tribunale di PADOVA",
+    "codiceTribunale": "0280600097",
+    "esito": null
+   },
+   {
+    "id": 4646192,
+    "tipoLotto": "IMMOBILI",
+    "categoriaLotto": "IMMOBILE_RESIDENZIALE",
+    "categoriaBene": [
+     "ABITAZIONE_TIPO_CIV"
+    ],
+    "indirizzo": {
+     "via": "Via Ansuino da Forlì 64d",
+     "numeroCivico": "",
+     "cap": "35134",
+     "citta": "Padova",
+     "provincia": "Padova",
+     "coordinate": {
+      "latitudine": 45.432362,
+      "longitudine": 11.881833
+     },
+     "codNazione": null,
+     "codRegione": null,
+     "codProvincia": null,
+     "codComune": null,
+     "idIndirizzo": null,
+     "descComune": null,
+     "descProvincia": null,
+     "descRegione": null,
+     "descNazione": null,
+     "comuneEstero": null
+    },
+    "numeroLotto": "LOTTO UNICO",
+    "procedura": "119",
+    "prezzoBaseAsta": 153000.0,
+    "dataVendita": "2027-01-21",
+    "orarioVendita": "12:00",
+    "dataOraVendita": "2027-01-21T12:00",
+    "dataPubblicazione": "2026-10-15",
+    "immagine": null,
+    "immagineCover": null,
+    "offertaMinima": 114750.0,
+    "rialzoMinimo": 1000.0,
+    "disponibilita": [
+     "NON_SPECIFICATA"
+    ],
+    "descLotto": "Piena proprietà dell’unità immobiliare a destinazione abitativa di tipologia “appartamento” (Mapp. N. 141 Sub.6) collocato al piano terzo su fabbricato/complesso condominiale denominato “Sindy – Fabbricato “A”, con collegata unità al piano seminterrato dello stesso fabbricato/complesso condominiale avente destinazione garage/autorimessa (Mappale n. 141 sub. 9) il tutto ubicato in Padova (PD) Via Ansuino da Forlì n. 64/D Scala B Interno 12. Vendita competitiva telematica sul por",
+    "descLottoDE": null,
+    "tribunale": "Tribunale di PADOVA",
+    "codiceTribunale": "0280600097",
+    "esito": null
+   },
+   {
+    "id": 4644799,
+    "tipoLotto": "IMMOBILI",
+    "categoriaLotto": "IMMOBILE_RESIDENZIALE",
+    "categoriaBene": [
+     "APPARTAMENTO"
+    ],
+    "indirizzo": {
+     "via": "Str. Rovigana, 2, 35043 Monselice PD, Italia",
+     "numeroCivico": "",
+     "cap": "35043",
+     "citta": "Monselice",
+     "provincia": "Padova",
+     "coordinate": {
+      "latitudine": 45.236871,
+      "longitudine": 11.754549
+     },
+     "codNazione": null,
+     "codRegione": null,
+     "codProvincia": null,
+     "codComune": null,
+     "idIndirizzo": null,
+     "descComune": null,
+     "descProvincia": null,
+     "descRegione": null,
+     "descNazione": null,
+     "comuneEstero": null
+    },
+    "numeroLotto": "LOTTO UNICO",
+    "procedura": "33",
+    "prezzoBaseAsta": 102000.0,
+    "dataVendita": "2027-01-12",
+    "orarioVendita": "15:30",
+    "dataOraVendita": "2027-01-12T15:30",
+    "dataPubblicazione": "2026-10-13",
+    "immagine": null,
+    "immagineCover": null,
+    "offertaMinima": 76500.0,
+    "rialzoMinimo": 1000.0,
+    "disponibilita": [
+     "NON_SPECIFICATA"
+    ],
+    "descLotto": "Diritti di piena proprietà per l’intero su appartamento di categoria residenziale posto al piano terra, scala B, di un fabbricato condominiale denominato “I Platani”.",
+    "descLottoDE": null,
+    "tribunale": "Tribunale di PADOVA",
+    "codiceTribunale": "0280600097",
+    "esito": null
+   },
+   {
+    "id": 4619178,
+    "tipoLotto": "IMMOBILI",
+    "categoriaLotto": "IMMOBILE_COMMERCIALE",
+    "categoriaBene": [
+     "UFFICIO"
+    ],
+    "indirizzo": {
+     "via": "Viale dell'Industria, 72, a",
+     "numeroCivico": "",
+     "cap": "35129",
+     "citta": "Padova",
+     "provincia": "Padova",
+     "coordinate": null,
+     "codNazione": null,
+     "codRegione": null,
+     "codProvincia": null,
+     "codComune": null,
+     "idIndirizzo": null,
+     "descComune": null,
+     "descProvincia": null,
+     "descRegione": null,
+     "descNazione": null,
+     "comuneEstero": null
+    },
+    "numeroLotto": "LOTTO UNICO",
+    "procedura": "121",
+    "prezzoBaseAsta": 105000.0,
+    "dataVendita": "2026-12-22",
+    "orarioVendita": "11:00",
+    "dataOraVendita": "2026-12-22T11:00",
+    "dataPubblicazione": "2026-08-01",
+    "immagine": null,
+    "immagineCover": null,
+    "offertaMinima": 78750.0,
+    "rialzoMinimo": 1000.0,
+    "disponibilita": [
+     "OCCUP"
+    ],
+    "descLotto": "L'unità immobiliare, come rinvenibile in censo e al lordo delle difformità rilevate risulta composta da: ingresso, archivio di circa arrotondati mq. 20,50, c.t. di circa arrotondati mq. 5,00, antibagno di circa arrotondati mq. 7,00, wc di circa arrotondati mq. 3,00, wc di circa arrotondati mq. 1,50, ufficio di circa arrotondati mq. 21,00, ufficio di circa arrotondati mq. 38,00, ufficio di circa arrotondati mq. 31,50, per complessivi netti arrotondati circa 146,00 mq oltre alle parti comuni con altri beni.  ",
+    "descLottoDE": null,
+    "tribunale": "Tribunale di PADOVA",
+    "codiceTribunale": "0280600097",
+    "esito": null
+   }
+  ],
+  "pageable": {
+   "sort": {
+    "empty": false,
+    "sorted": true,
+    "unsorted": false
+   },
+   "offset": 0,
+   "pageNumber": 0,
+   "pageSize": 40,
+   "paged": true,
+   "unpaged": false
+  },
+  "totalPages": 68,
+  "totalElements": 6,
+  "last": true,
+  "size": 40,
+  "number": 0,
+  "sort": {
+   "empty": false,
+   "sorted": true,
+   "unsorted": false
+  },
+  "numberOfElements": 40,
+  "first": true,
+  "empty": false
+ },
+ "error": null
+}

@@ -1,0 +1,19 @@
+{
+ "host": "https://pvp.giustizia.it",
+ "bucketsHost": "https://resource-pvp.giustizia.it",
+ "msUrl": {
+  "vendite": "ve-3f723b85-986a1b71/ve-ms",
+  "newsletter": "cmsc-54844837-986a1b71/nl-ms",
+  "ricerca": "ric-496b258c-986a1b71/ric-ms",
+  "workflow": "wf-d7232c05-986a1b71/wf-ms",
+  "fileManager": "file-manager",
+  "bdag": "bdag-14ee2f74-986a1b71/bdag-ms",
+  "offerta": "of-ffde1d0f-986a1b71/of-ms",
+  "quartz": "quartz-service",
+  "backoffice": "bo-5897bc47-986a1b71/bo-ms",
+  "monitoraggio": "bo-5897bc47-986a1b71/mon-ms",
+  "statService": "stat-service",
+  "dashboard": "dashb-ca7d811b-986a1b71/ds-ms",
+  "prenotazioneVisita": "cmsc-54844837-986a1b71/rvb-ms"
+ }
+}

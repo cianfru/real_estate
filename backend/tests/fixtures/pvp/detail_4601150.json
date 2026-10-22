@@ -1,0 +1,429 @@
+{
+ "messaggio": "Operazione effettuata con successo",
+ "body": {
+  "numElementiPagina": 0,
+  "numPagina": 0,
+  "idVendita": 4601150,
+  "codTipoVendita": "SENIN",
+  "descTipoVendita": "Senza Incanto",
+  "dataVendita": "23/10/2026",
+  "oraVendita": "09:00",
+  "indirizzo": {
+   "via": "presso il Tribunale di Treviso, in Viale G. Verdi n. 18, Treviso (TV) - Piano Primo - Aula D",
+   "numeroCivico": null,
+   "cap": "31100",
+   "citta": null,
+   "provincia": null,
+   "coordinate": null,
+   "codNazione": "ITA",
+   "codRegione": "21",
+   "codProvincia": "TV",
+   "codComune": "26086",
+   "idIndirizzo": 7377146,
+   "descComune": "Treviso",
+   "descProvincia": "Treviso",
+   "descRegione": "Veneto",
+   "descNazione": "Italia",
+   "comuneEstero": null
+  },
+  "impoOffertaMinima": 101250,
+  "impoOffertaAumento": 3000,
+  "impoBaseAsta": 135000,
+  "codModVendita": "VENDMIS",
+  "descModVendita": "Sincrona Mista",
+  "dataTermPresOff": "22/10/2026",
+  "oraTermPresOff": "13:00",
+  "dataDiPubblicazione": "30/06/2026",
+  "lotto": {
+   "codiLotto": null,
+   "beni": null,
+   "idLotto": 2458081,
+   "codLotto": "1",
+   "descLotto": "Abitazione unifamiliare su due livelli con garage e annessa area scoperta. Parzialmente occupato in forza di contralto di locazione",
+   "descLottoDE": null,
+   "codTipoCategLotto": "IMMOBILE_RESIDENZIALE",
+   "descTipoCategLotto": "Immobile Residenziale",
+   "codTipoLotto": "IMMOBILI",
+   "descTipoLotto": "Immobili",
+   "flagStatoDA": null,
+   "indirizzo": {
+    "via": "Via dell'Isola, 20, 31100 Treviso TV, Italia",
+    "numeroCivico": null,
+    "cap": "31100",
+    "citta": null,
+    "provincia": null,
+    "coordinate": {
+     "latitudine": 45.6439577,
+     "longitudine": 12.191446
+    },
+    "codNazione": "ITA",
+    "codRegione": "21",
+    "codProvincia": "TV",
+    "codComune": "26086",
+    "idIndirizzo": 7377144,
+    "descComune": "Treviso",
+    "descProvincia": "Treviso",
+    "descRegione": "Veneto",
+    "descNazione": "Italia",
+    "comuneEstero": null
+   },
+   "idEspVendita": null
+  },
+  "siti": [
+   {
+    "idSito": 9,
+    "link": "https://www.asteannunci.it",
+    "urlInserizione": "https://www.asteannunci.it/aste/pvp/4601150",
+    "codiSito": "SIP0009",
+    "flagTipoSito": "P",
+    "dataPrimoAck": "2026-06-30T09:30:33",
+    "codiUfficio": "0260860099",
+    "nomeUfficio": "Tribunale di TREVISO",
+    "urlWsdlPubblicita": "https://service.asteannunci.it/pubblicita?wsdl",
+    "urlRicerca": "https://www.asteannunci.it/aste/cerca?id_asta=${idInserzione}",
+    "nomeSito": "www.asteannunci.it - Aste annunci pubblica gli avvisi delle aste giudiziarie, aste immobiliari e aste fallimentari dei tribunali. Ricerca le aste giudiziarie della tua città"
+   },
+   {
+    "idSito": 16,
+    "link": "https://www.rivistaastegiudiziarie.it",
+    "urlInserizione": "https://www.rivistaastegiudiziarie.it/aste/pvp/4601150",
+    "codiSito": "SIP0016",
+    "flagTipoSito": "P",
+    "dataPrimoAck": "2026-06-30T09:30:37",
+    "codiUfficio": "0260860099",
+    "nomeUfficio": "Tribunale di TREVISO",
+    "urlWsdlPubblicita": "https://service.rivistaastegiudiziarie.it/pubblicita?wsdl",
+    "urlRicerca": "https://www.rivistaastegiudiziarie.it/aste/cerca?id_asta=${idInserzione}",
+    "nomeSito": "www.rivistaastegiudiziarie.it - RivistaAsteGiudiziarie è un motore di ricerca delle aste giudiziarie. Attraverso una guida scoprirete cosa sono le aste giudiziarie e le modalità di partecipazione"
+   },
+   {
+    "idSito": 60,
+    "link": "https://www.fallcoaste.it",
+    "urlInserizione": "https://www.fallcoaste.it/vendita/abitazione-unifamiliare-su-due-livelli-con-garage-e-annessa-area-scoperta-parzialmente-occupato-in-forza-di-contralto-di-locazione-1627425.html",
+    "codiSito": "SIP0060",
+    "flagTipoSito": "P",
+    "dataPrimoAck": "2026-07-01T09:00:18",
+    "codiUfficio": "0260860099",
+    "nomeUfficio": "Tribunale di TREVISO",
+    "urlWsdlPubblicita": "https://api.fallcoaste.it/www/ricezione_richiesta_pubblicazione.php",
+    "urlRicerca": "https://www.fallcoaste.it/ricerca.html?idInserzioneEspVendita=${idInserzione}",
+    "nomeSito": "FALLCO ASTE: il sito internet di ZUCCHETTI per la pubblicità ai sensi dell'art. 490 2° comma c.p.c"
+   },
+   {
+    "idSito": 17,
+    "link": "https://www.asteavvisi.it",
+    "urlInserizione": "https://www.asteavvisi.it/aste/pvp/4601150",
+    "codiSito": "SIP0017",
+    "flagTipoSito": "P",
+    "dataPrimoAck": "2026-06-30T09:30:35",
+    "codiUfficio": "0260860099",
+    "nomeUfficio": "Tribunale di TREVISO",
+    "urlWsdlPubblicita": "https://service.asteavvisi.it/pubblicita?wsdl",
+    "urlRicerca": "https://www.asteavvisi.it/aste/cerca?id_asta=${idInserzione}",
+    "nomeSito": "www.asteavvisi.it - Aste Avvisi è un motore di ricerca delle aste giudiziarie. Attraverso una guida scoprirete cosa sono le aste giudiziarie, le modalità di partecipazione e le tipologie di vendita"
+   },
+   {
+    "idSito": 69,
+    "link": "https://www.fallcoaste.it",
+    "urlInserizione": "https://www.fallcoaste.it/vendita/abitazione-unifamiliare-su-due-livelli-con-garage-e-annessa-area-scoperta-parzialmente-occupato-in-forza-di-contralto-di-locazione-1627425.html",
+    "codiSito": "4",
+    "flagTipoSito": "V",
+    "dataPrimoAck": "2026-07-01T09:00:19",
+    "codiUfficio": "0260860099",
+    "nomeUfficio": "Tribunale di TREVISO",
+    "urlWsdlOfferta": "https://api.fallcoaste.it/www/ricezione_offerta.php",
+    "urlWsdlPubblicita": "https://api.fallcoaste.it/www/gestore_ricezione_richiesta_pubblicazione.php",
+    "nomeSito": "FALLCO ASTE: il sito di Zucchetti per la gestione delle vendite telematiche ex DM 32/2015"
+   },
+   {
+    "idSito": 18,
+    "link": "https://www.canaleaste.it",
+    "urlInserizione": "https://www.canaleaste.it/aste/pvp/4601150",
+    "codiSito": "SIP0018",
+    "flagTipoSito": "P",
+    "dataPrimoAck": "2026-06-30T09:30:36",
+    "codiUfficio": "0260860099",
+    "nomeUfficio": "Tribunale di TREVISO",
+    "urlWsdlPubblicita": "https://service.canaleaste.it/pubblicita?wsdl",
+    "urlRicerca": "https://www.canaleaste.it/aste/cerca?id_asta=${idInserzione}",
+    "nomeSito": "www.canaleaste.it - Canale Aste è una web TV e canale satellitare tematico sulle aste giudiziarie, aste fallimentari e aste immobiliari"
+   },
+   {
+    "idSito": 7,
+    "link": "https://www.asteonline.it",
+    "urlInserizione": "https://www.asteonline.it/bidexchange/inserzioni/detail/4601150",
+    "codiSito": "SIP0007",
+    "flagTipoSito": "P",
+    "dataPrimoAck": "2026-06-30T17:50:14",
+    "codiUfficio": "0260860099",
+    "nomeUfficio": "Tribunale di TREVISO",
+    "urlWsdlPubblicita": "https://pvp.asteonline.it/webservices/esperimentovendita.asmx?WSDL",
+    "urlRicerca": "https://pvp.asteonline.it/inserzioni/search/${idInserzione}",
+    "nomeSito": "www.asteonline.it"
+   }
+  ],
+  "altriSiti": [
+   {
+    "idSito": 2665951,
+    "urlSito": "https://www.ca-venezia.giustizia.it"
+   },
+   {
+    "idSito": 2665947,
+    "urlSito": "https://www.tribunale.treviso.giustizia.it"
+   },
+   {
+    "idSito": 2665971,
+    "urlSito": "https://www.associazione-asset.it"
+   }
+  ],
+  "beni": [
+   {
+    "tipologia": null,
+    "descrizione": "Abitazione unifamiliare su due livelli con garage e annessa area scoperta. Parzialmente occupato in forza di contralto di locazione",
+    "indirizzoText": null,
+    "idBene": 3167989,
+    "codTipoLotto": "IMMOBILI",
+    "descTipoLotto": "Immobili",
+    "codTipoCategLotto": "IMMOBILE_RESIDENZIALE",
+    "descTipoCategLotto": "Immobile Residenziale",
+    "codTipologiaBene": "ABITAZIONE_TIPO_CIV",
+    "descTipologiaBene": "Abitazione Di Tipo Civile",
+    "procedura": {
+     "idProcedura": 1011147,
+     "flgStatoAC": null,
+     "flgVenditaGiudiziariaSN": null,
+     "numeAnnoRg": null,
+     "numeRg": null,
+     "codTipoRito": null,
+     "descTipoRito": null,
+     "codUfficio": null,
+     "descUfficio": null,
+     "codTipoRegistro": null,
+     "descTipoRegistro": null,
+     "generaProgressivo": false,
+     "idEspVendita": null,
+     "allegatoDTO": null,
+     "nomeTitolarePegno": null,
+     "cognomeTitolarePegno": null,
+     "codfisTitolarePegno": null
+    },
+    "indirizzo": {
+     "via": "Via dell'Isola, 20, 31100 Treviso TV, Italia",
+     "numeroCivico": null,
+     "cap": "31100",
+     "citta": null,
+     "provincia": null,
+     "coordinate": {
+      "latitudine": 45.6439577,
+      "longitudine": 12.191446
+     },
+     "codNazione": "ITA",
+     "codRegione": "21",
+     "codProvincia": "TV",
+     "codComune": "26086",
+     "idIndirizzo": 7378784,
+     "descComune": "Treviso",
+     "descProvincia": "Treviso",
+     "descRegione": "Veneto",
+     "descNazione": "Italia",
+     "comuneEstero": null
+    },
+    "datiCatastali": [
+     {
+      "textFoglio": "1",
+      "textGraffato": null,
+      "textParticella": "162",
+      "textSezione": "L",
+      "textSubalterno": "6 (Cat. A/2)",
+      "textSubalterno2": null,
+      "textSubParticella": null
+     },
+     {
+      "textFoglio": "1",
+      "textGraffato": null,
+      "textParticella": "162",
+      "textSezione": "L",
+      "textSubalterno": "5 ( Cat. C/6)",
+      "textSubalterno2": null,
+      "textSubParticella": null
+     },
+     {
+      "textFoglio": "51 CT",
+      "textGraffato": null,
+      "textParticella": "162 (ente urbano)",
+      "textSezione": null,
+      "textSubalterno": null,
+      "textSubalterno2": null,
+      "textSubParticella": null
+     }
+    ],
+    "flagTipoCatastoUT": null,
+    "datiDenuncia": {
+     "annoDenuncia": null,
+     "dataDenuncia": null,
+     "numeDenuncia": null,
+     "tipoDenuncia": null,
+     "descTipoDenuncia": null
+    },
+    "descrizioneDE": null,
+    "allegati": [
+     {
+      "idAllegato": 12415040,
+      "nomeFile": "12084383_lotto_1.jpg",
+      "linkAllegato": "/immagini-beni/4601150/3167989/12084383_lotto_1.jpg?versionId=fa7a3f2b-3c46-469d-8cef-43f989c5c224",
+      "dimensioneAllegato": 33467,
+      "descrizione": "IMMAGINE BENE",
+      "inserimentoLotto": false
+     }
+    ],
+    "codiceTipoDispBene": "OCCUP",
+    "disponibilita": "OCCUP",
+    "disponibilitaDesc": "Occupato",
+    "luogoRitiro": null,
+    "codiceTipoConsegna": null,
+    "descTipoConsegna": null,
+    "textSpedizione": null,
+    "superficie": "198 mq",
+    "numeroVani": 9.5,
+    "piano": "T",
+    "codDescAteco": null,
+    "codiciAteco": null,
+    "flagClassatoTF": null,
+    "luogoRitiroUgualeIndirizzo": false,
+    "aiGenerated": false
+   }
+  ],
+  "procedura": {
+   "idProcedura": 1011147,
+   "flgStatoAC": null,
+   "flgVenditaGiudiziariaSN": true,
+   "numeAnnoRg": 2024,
+   "numeRg": "158",
+   "codTipoRito": "EICA",
+   "descTipoRito": "Espropriazione Immobiliare (cartabia)",
+   "codUfficio": "0260860099",
+   "descUfficio": "Tribunale di TREVISO",
+   "codTipoRegistro": "ESECUZIONI_CIVILI_IMMOBILIARI",
+   "descTipoRegistro": "Esecuzioni Civili Immobiliari",
+   "generaProgressivo": false,
+   "idEspVendita": null,
+   "allegatoDTO": null,
+   "nomeTitolarePegno": null,
+   "cognomeTitolarePegno": null,
+   "codfisTitolarePegno": null
+  },
+  "soggetti": [
+   {
+    "idSoggetto": 5506028,
+    "ruolo": "DELEGATO",
+    "nome": "Nome",
+    "cognome": "Cognome1",
+    "telefono": "0000000000",
+    "email": "professionista1@example.org",
+    "soggOpVendita": true,
+    "soggVisitaBene": false,
+    "cf": "RSSMRA80A01H501U",
+    "tipoSoggetto": 539,
+    "aiGenerated": false
+   },
+   {
+    "idSoggetto": 5506029,
+    "ruolo": "CUSTODE",
+    "nome": "Nome",
+    "cognome": "Cognome2",
+    "telefono": "0000000000",
+    "email": "professionista2@example.org",
+    "soggOpVendita": false,
+    "soggVisitaBene": true,
+    "cf": "RSSMRA80A01H501U",
+    "tipoSoggetto": 537,
+    "aiGenerated": false
+   },
+   {
+    "idSoggetto": 5506030,
+    "ruolo": "GIUDICE",
+    "nome": "Nome",
+    "cognome": "Cognome3",
+    "soggOpVendita": false,
+    "soggVisitaBene": false,
+    "cf": "RSSMRA80A01H501U",
+    "tipoSoggetto": 530,
+    "aiGenerated": false,
+    "email": "professionista3@example.org",
+    "telefono": "0000000000"
+   }
+  ],
+  "allegati": [
+   {
+    "idAllegato": 12414653,
+    "nomeFile": "12207557_avviso.pdf",
+    "linkAllegato": "/allegati/4601150/12207557_avviso.pdf?versionId=e5769048-23d1-4e27-bcc9-703bd8aeb01e",
+    "dimensioneAllegato": 1866263,
+    "descrizione": "Avviso di vendita",
+    "codiceTipoAllegato": "AVEND",
+    "inserimentoLotto": false
+   },
+   {
+    "idAllegato": 12414676,
+    "nomeFile": "12207598_perizia.pdf",
+    "linkAllegato": "/allegati/4601150/12207598_perizia.pdf?versionId=e61c701f-021d-4d08-aa82-d00a6d1878b5",
+    "dimensioneAllegato": 1669515,
+    "descrizione": "Perizia",
+    "codiceTipoAllegato": "STIMA",
+    "inserimentoLotto": false
+   },
+   {
+    "idAllegato": 12414971,
+    "nomeFile": "12207605_perizia-compendio-immobiliare.zip",
+    "linkAllegato": "/allegati/4601150/12207605_perizia-compendio-immobiliare.zip?versionId=0d5d1ace-f8c2-43bc-aa65-c9b630a17019",
+    "dimensioneAllegato": 4778499,
+    "descrizione": "Allegati alla perizia di stima",
+    "codiceTipoAllegato": "ALTRO",
+    "inserimentoLotto": false
+   },
+   {
+    "idAllegato": 12414647,
+    "nomeFile": "12207556_ordinanza.pdf",
+    "linkAllegato": "/allegati/4601150/12207556_ordinanza.pdf?versionId=c1b8855d-9881-4dc1-9c13-f739530e7e0b",
+    "dimensioneAllegato": 121273,
+    "descrizione": "Ordinanza di vendita",
+    "codiceTipoAllegato": "ORDIN",
+    "inserimentoLotto": false
+   },
+   {
+    "idAllegato": 12414964,
+    "nomeFile": "ALLEGATO-5A-DOCUMENTAZIONE-FOTOGRAFICA.pdf",
+    "linkAllegato": "/allegati/4601150/ALLEGATO-5A-DOCUMENTAZIONE-FOTOGRAFICA.pdf?versionId=d4ac6690-9e2b-40f7-8735-0d072e013a32",
+    "dimensioneAllegato": 159283,
+    "descrizione": "Documentazione fotografica",
+    "codiceTipoAllegato": "ALTRO",
+    "inserimentoLotto": false
+   }
+  ],
+  "datiDeposito": {
+   "depoCauzionale": "10% del prezzo offerto",
+   "depoCauzionaleDe": null,
+   "dataTermineDeposito": null,
+   "modalitaDeposito": null,
+   "modalitaDepositoDE": null,
+   "depositoContoSpese": null,
+   "depositoContoSpeseDe": null
+  },
+  "flgEsenzionePagamentoSN": false,
+  "flgSpesaPrenDebitoSN": false,
+  "flgSpesaPrenDebito48SN": false,
+  "flgContrNonDovutoSN": false,
+  "flgStatoAnnuncio": "P",
+  "codFiscaleCustode": "RSSMRA80A01H501U",
+  "dataCreazioneAnnuncio": "29/06/2026",
+  "flagEliminaIndirizzo": false,
+  "flagEliminaIndirizzoVendita": false,
+  "statoCerificazione": "P",
+  "flagStatoRicevuta": "S",
+  "flgContributoPagato": false,
+  "aiGenerated": false,
+  "duplicato": false,
+  "lottoEsistente": false
+ },
+ "error": null
+}

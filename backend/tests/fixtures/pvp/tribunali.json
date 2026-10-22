@@ -1,0 +1,690 @@
+{
+ "messaggio": "Operazione effettuata con successo",
+ "body": [
+  {
+   "codUfficio": "0840010091",
+   "nomeUfficio": "Tribunale di AGRIGENTO"
+  },
+  {
+   "codUfficio": "0060030091",
+   "nomeUfficio": "Tribunale di ALESSANDRIA"
+  },
+  {
+   "codUfficio": "0060010097",
+   "nomeUfficio": "Tribunale di ALESSANDRIA ex Tribunale di ACQUI TERME"
+  },
+  {
+   "codUfficio": "0061740092",
+   "nomeUfficio": "Tribunale di ALESSANDRIA ex Tribunale di TORTONA"
+  },
+  {
+   "codUfficio": "0420020093",
+   "nomeUfficio": "Tribunale di ANCONA"
+  },
+  {
+   "codUfficio": "0070030092",
+   "nomeUfficio": "Tribunale di AOSTA"
+  },
+  {
+   "codUfficio": "0510020094",
+   "nomeUfficio": "Tribunale di AREZZO"
+  },
+  {
+   "codUfficio": "0440070095",
+   "nomeUfficio": "Tribunale di ASCOLI PICENO"
+  },
+  {
+   "codUfficio": "0050050094",
+   "nomeUfficio": "Tribunale di ASTI"
+  },
+  {
+   "codUfficio": "0040030099",
+   "nomeUfficio": "Tribunale di ASTI ex Tribunale di ALBA"
+  },
+  {
+   "codUfficio": "0640080091",
+   "nomeUfficio": "Tribunale di AVELLINO"
+  },
+  {
+   "codUfficio": "0640920098",
+   "nomeUfficio": "Tribunale di AVELLINO ex Tribunale di SANT'ANGELO DEI LOMBARDI"
+  },
+  {
+   "codUfficio": "0660060099",
+   "nomeUfficio": "Tribunale di AVEZZANO"
+  },
+  {
+   "codUfficio": "0830050098",
+   "nomeUfficio": "Tribunale di BARCELLONA POZZO DI GOTTO"
+  },
+  {
+   "codUfficio": "0830410196",
+   "nomeUfficio": "Tribunale di BARCELLONA POZZO DI GOTTO - Sezione distaccata di LIPARI\n"
+  },
+  {
+   "codUfficio": "0720060097",
+   "nomeUfficio": "Tribunale di BARI"
+  },
+  {
+   "codUfficio": "0250060090",
+   "nomeUfficio": "Tribunale di BELLUNO"
+  },
+  {
+   "codUfficio": "0620080099",
+   "nomeUfficio": "Tribunale di BENEVENTO"
+  },
+  {
+   "codUfficio": "0640050095",
+   "nomeUfficio": "Tribunale di BENEVENTO ex Tribunale di ARIANO IRPINO"
+  },
+  {
+   "codUfficio": "0160240097",
+   "nomeUfficio": "Tribunale di BERGAMO"
+  },
+  {
+   "codUfficio": "0960040091",
+   "nomeUfficio": "Tribunale di BIELLA"
+  },
+  {
+   "codUfficio": "0370060094",
+   "nomeUfficio": "Tribunale di BOLOGNA"
+  },
+  {
+   "codUfficio": "0210080090",
+   "nomeUfficio": "Tribunale di BOLZANO"
+  },
+  {
+   "codUfficio": "0170290098",
+   "nomeUfficio": "Tribunale di BRESCIA"
+  },
+  {
+   "codUfficio": "0740010099",
+   "nomeUfficio": "Tribunale di BRINDISI"
+  },
+  {
+   "codUfficio": "0120260097",
+   "nomeUfficio": "Tribunale di BUSTO ARSIZIO"
+  },
+  {
+   "codUfficio": "0920090097",
+   "nomeUfficio": "Tribunale di CAGLIARI"
+  },
+  {
+   "codUfficio": "0870110095",
+   "nomeUfficio": "Tribunale di CALTAGIRONE"
+  },
+  {
+   "codUfficio": "0850040098",
+   "nomeUfficio": "Tribunale di CALTANISSETTA"
+  },
+  {
+   "codUfficio": "0700060095",
+   "nomeUfficio": "Tribunale di CAMPOBASSO"
+  },
+  {
+   "codUfficio": "0600190090",
+   "nomeUfficio": "Tribunale di CASSINO"
+  },
+  {
+   "codUfficio": "0780330090",
+   "nomeUfficio": "Tribunale di CASTROVILLARI"
+  },
+  {
+   "codUfficio": "0781080099",
+   "nomeUfficio": "Tribunale di CASTROVILLARI ex Tribunale di ROSSANO"
+  },
+  {
+   "codUfficio": "0870150093",
+   "nomeUfficio": "Tribunale di CATANIA"
+  },
+  {
+   "codUfficio": "0790230090",
+   "nomeUfficio": "Tribunale di CATANZARO"
+  },
+  {
+   "codUfficio": "0690220096",
+   "nomeUfficio": "Tribunale di CHIETI"
+  },
+  {
+   "codUfficio": "0690580193",
+   "nomeUfficio": "Tribunale di CHIETI - Sezione distaccata di ORTONA\n"
+  },
+  {
+   "codUfficio": "0580320094",
+   "nomeUfficio": "Tribunale di CIVITAVECCHIA"
+  },
+  {
+   "codUfficio": "0130750091",
+   "nomeUfficio": "Tribunale di COMO"
+  },
+  {
+   "codUfficio": "0780450095",
+   "nomeUfficio": "Tribunale di COSENZA"
+  },
+  {
+   "codUfficio": "0190360095",
+   "nomeUfficio": "Tribunale di CREMONA"
+  },
+  {
+   "codUfficio": "0190350093",
+   "nomeUfficio": "Tribunale di CREMONA ex Tribunale di CREMA"
+  },
+  {
+   "codUfficio": "1010100092",
+   "nomeUfficio": "Tribunale di CROTONE"
+  },
+  {
+   "codUfficio": "0040780096",
+   "nomeUfficio": "Tribunale di CUNEO"
+  },
+  {
+   "codUfficio": "0041300098",
+   "nomeUfficio": "Tribunale di CUNEO ex Tribunale di MONDOVI"
+  },
+  {
+   "codUfficio": "0042030093",
+   "nomeUfficio": "Tribunale di CUNEO ex Tribunale di SALUZZO"
+  },
+  {
+   "codUfficio": "0860090099",
+   "nomeUfficio": "Tribunale di ENNA"
+  },
+  {
+   "codUfficio": "0860120096",
+   "nomeUfficio": "Tribunale di ENNA ex Tribunale di NICOSIA"
+  },
+  {
+   "codUfficio": "0440190090",
+   "nomeUfficio": "Tribunale di FERMO"
+  },
+  {
+   "codUfficio": "0380080099",
+   "nomeUfficio": "Tribunale di FERRARA"
+  },
+  {
+   "codUfficio": "0480170090",
+   "nomeUfficio": "Tribunale di FIRENZE"
+  },
+  {
+   "codUfficio": "0710240094",
+   "nomeUfficio": "Tribunale di FOGGIA"
+  },
+  {
+   "codUfficio": "0710280092",
+   "nomeUfficio": "Tribunale di FOGGIA ex Tribunale di LUCERA"
+  },
+  {
+   "codUfficio": "0400120092",
+   "nomeUfficio": "Tribunale di FORLI'"
+  },
+  {
+   "codUfficio": "0600380090",
+   "nomeUfficio": "Tribunale di FROSINONE"
+  },
+  {
+   "codUfficio": "0850070094",
+   "nomeUfficio": "Tribunale di GELA"
+  },
+  {
+   "codUfficio": "0100250093",
+   "nomeUfficio": "Tribunale di GENOVA"
+  },
+  {
+   "codUfficio": "0100150092",
+   "nomeUfficio": "Tribunale di GENOVA ex Tribunale di CHIAVARI"
+  },
+  {
+   "codUfficio": "0310070090",
+   "nomeUfficio": "Tribunale di GORIZIA"
+  },
+  {
+   "codUfficio": "0530110095",
+   "nomeUfficio": "Tribunale di GROSSETO"
+  },
+  {
+   "codUfficio": "0080310092",
+   "nomeUfficio": "Tribunale di IMPERIA"
+  },
+  {
+   "codUfficio": "0080550092",
+   "nomeUfficio": "Tribunale di IMPERIA ex Tribunale di SAN REMO"
+  },
+  {
+   "codUfficio": "0940230099",
+   "nomeUfficio": "Tribunale di ISERNIA"
+  },
+  {
+   "codUfficio": "0011250094",
+   "nomeUfficio": "Tribunale di IVREA"
+  },
+  {
+   "codUfficio": "0660490099",
+   "nomeUfficio": "Tribunale di L'AQUILA"
+  },
+  {
+   "codUfficio": "0110150093",
+   "nomeUfficio": "Tribunale di LA SPEZIA"
+  },
+  {
+   "codUfficio": "0760390090",
+   "nomeUfficio": "Tribunale di LAGONEGRO"
+  },
+  {
+   "codUfficio": "0651140097",
+   "nomeUfficio": "Tribunale di LAGONEGRO ex Tribunale di SALA CONSILINA"
+  },
+  {
+   "codUfficio": "0791600090",
+   "nomeUfficio": "Tribunale di LAMEZIA TERME"
+  },
+  {
+   "codUfficio": "0690460096",
+   "nomeUfficio": "Tribunale di LANCIANO"
+  },
+  {
+   "codUfficio": "0690050192",
+   "nomeUfficio": "Tribunale di LANCIANO - Sezione distaccata di ATESSA\n"
+  },
+  {
+   "codUfficio": "0910370095",
+   "nomeUfficio": "Tribunale di LANUSEI"
+  },
+  {
+   "codUfficio": "0700310098",
+   "nomeUfficio": "Tribunale di LARINO"
+  },
+  {
+   "codUfficio": "0590110091",
+   "nomeUfficio": "Tribunale di LATINA"
+  },
+  {
+   "codUfficio": "0750350091",
+   "nomeUfficio": "Tribunale di LECCE"
+  },
+  {
+   "codUfficio": "0970420092",
+   "nomeUfficio": "Tribunale di LECCO"
+  },
+  {
+   "codUfficio": "0490090094",
+   "nomeUfficio": "Tribunale di LIVORNO"
+  },
+  {
+   "codUfficio": "0490140197",
+   "nomeUfficio": "Tribunale di LIVORNO - Sezione distaccata di PORTOFERRAIO\n"
+  },
+  {
+   "codUfficio": "0800430095",
+   "nomeUfficio": "Tribunale di LOCRI"
+  },
+  {
+   "codUfficio": "0980310090",
+   "nomeUfficio": "Tribunale di LODI"
+  },
+  {
+   "codUfficio": "0460170098",
+   "nomeUfficio": "Tribunale di LUCCA"
+  },
+  {
+   "codUfficio": "0430230098",
+   "nomeUfficio": "Tribunale di MACERATA"
+  },
+  {
+   "codUfficio": "0430070094",
+   "nomeUfficio": "Tribunale di MACERATA ex Tribunale di CAMERINO"
+  },
+  {
+   "codUfficio": "0200300096",
+   "nomeUfficio": "Tribunale di MANTOVA"
+  },
+  {
+   "codUfficio": "0810110099",
+   "nomeUfficio": "Tribunale di MARSALA"
+  },
+  {
+   "codUfficio": "0450100093",
+   "nomeUfficio": "Tribunale di MASSA"
+  },
+  {
+   "codUfficio": "0770140099",
+   "nomeUfficio": "Tribunale di MATERA"
+  },
+  {
+   "codUfficio": "0830480098",
+   "nomeUfficio": "Tribunale di MESSINA"
+  },
+  {
+   "codUfficio": "0151460094",
+   "nomeUfficio": "Tribunale di MILANO"
+  },
+  {
+   "codUfficio": "0360230099",
+   "nomeUfficio": "Tribunale di MODENA"
+  },
+  {
+   "codUfficio": "0151490090",
+   "nomeUfficio": "Tribunale di MONZA"
+  },
+  {
+   "codUfficio": "0630490096",
+   "nomeUfficio": "Tribunale di NAPOLI"
+  },
+  {
+   "codUfficio": "0630370193",
+   "nomeUfficio": "Tribunale di NAPOLI - Sezione distaccata di ISCHIA\n"
+  },
+  {
+   "codUfficio": "0650780099",
+   "nomeUfficio": "Tribunale di NOCERA INFERIORE"
+  },
+  {
+   "codUfficio": "0630500099",
+   "nomeUfficio": "Tribunale di NOLA"
+  },
+  {
+   "codUfficio": "0031060096",
+   "nomeUfficio": "Tribunale di NOVARA"
+  },
+  {
+   "codUfficio": "0910510095",
+   "nomeUfficio": "Tribunale di NUORO"
+  },
+  {
+   "codUfficio": "06100500902",
+   "nomeUfficio": "Tribunale di Napoli nord in Aversa"
+  },
+  {
+   "codUfficio": "0950380091",
+   "nomeUfficio": "Tribunale di ORISTANO"
+  },
+  {
+   "codUfficio": "0280600097",
+   "nomeUfficio": "Tribunale di PADOVA"
+  },
+  {
+   "codUfficio": "0820530098",
+   "nomeUfficio": "Tribunale di PALERMO"
+  },
+  {
+   "codUfficio": "0800570094",
+   "nomeUfficio": "Tribunale di PALMI"
+  },
+  {
+   "codUfficio": "0780910092",
+   "nomeUfficio": "Tribunale di PAOLA"
+  },
+  {
+   "codUfficio": "0340270095",
+   "nomeUfficio": "Tribunale di PARMA"
+  },
+  {
+   "codUfficio": "0830660096",
+   "nomeUfficio": "Tribunale di PATTI"
+  },
+  {
+   "codUfficio": "0830520097",
+   "nomeUfficio": "Tribunale di PATTI ex Tribunale di MISTRETTA"
+  },
+  {
+   "codUfficio": "0181100092",
+   "nomeUfficio": "Tribunale di PAVIA"
+  },
+  {
+   "codUfficio": "0181770092",
+   "nomeUfficio": "Tribunale di PAVIA ex Tribunale di VIGEVANO"
+  },
+  {
+   "codUfficio": "0181820093",
+   "nomeUfficio": "Tribunale di PAVIA ex Tribunale di VOGHERA"
+  },
+  {
+   "codUfficio": "0540390094",
+   "nomeUfficio": "Tribunale di PERUGIA"
+  },
+  {
+   "codUfficio": "0410440090",
+   "nomeUfficio": "Tribunale di PESARO"
+  },
+  {
+   "codUfficio": "0680280097",
+   "nomeUfficio": "Tribunale di PESCARA"
+  },
+  {
+   "codUfficio": "0330320095",
+   "nomeUfficio": "Tribunale di PIACENZA"
+  },
+  {
+   "codUfficio": "0500260093",
+   "nomeUfficio": "Tribunale di PISA"
+  },
+  {
+   "codUfficio": "0470140093",
+   "nomeUfficio": "Tribunale di PISTOIA"
+  },
+  {
+   "codUfficio": "0930330099",
+   "nomeUfficio": "Tribunale di PORDENONE"
+  },
+  {
+   "codUfficio": "0760630091",
+   "nomeUfficio": "Tribunale di POTENZA"
+  },
+  {
+   "codUfficio": "0760480099",
+   "nomeUfficio": "Tribunale di POTENZA ex Tribunale di MELFI"
+  },
+  {
+   "codUfficio": "1000050090",
+   "nomeUfficio": "Tribunale di PRATO"
+  },
+  {
+   "codUfficio": "0880090091",
+   "nomeUfficio": "Tribunale di RAGUSA"
+  },
+  {
+   "codUfficio": "0880060095",
+   "nomeUfficio": "Tribunale di RAGUSA ex Tribunale di MODICA"
+  },
+  {
+   "codUfficio": "0390140093",
+   "nomeUfficio": "Tribunale di RAVENNA"
+  },
+  {
+   "codUfficio": "0800630097",
+   "nomeUfficio": "Tribunale di REGGIO CALABRIA"
+  },
+  {
+   "codUfficio": "0350330099",
+   "nomeUfficio": "Tribunale di REGGIO EMILIA"
+  },
+  {
+   "codUfficio": "0570590099",
+   "nomeUfficio": "Tribunale di RIETI"
+  },
+  {
+   "codUfficio": "0990140095",
+   "nomeUfficio": "Tribunale di RIMINI"
+  },
+  {
+   "codUfficio": "0580910098",
+   "nomeUfficio": "Tribunale di ROMA"
+  },
+  {
+   "codUfficio": "0221610095",
+   "nomeUfficio": "Tribunale di ROVERETO"
+  },
+  {
+   "codUfficio": "0290410098",
+   "nomeUfficio": "Tribunale di ROVIGO"
+  },
+  {
+   "codUfficio": "0651160091",
+   "nomeUfficio": "Tribunale di SALERNO"
+  },
+  {
+   "codUfficio": "0610830096",
+   "nomeUfficio": "Tribunale di SANTA MARIA CAPUA VETERE"
+  },
+  {
+   "codUfficio": "0900640091",
+   "nomeUfficio": "Tribunale di SASSARI"
+  },
+  {
+   "codUfficio": "0090560095",
+   "nomeUfficio": "Tribunale di SAVONA"
+  },
+  {
+   "codUfficio": "0840410095",
+   "nomeUfficio": "Tribunale di SCIACCA"
+  },
+  {
+   "codUfficio": "0520320098",
+   "nomeUfficio": "Tribunale di SIENA"
+  },
+  {
+   "codUfficio": "0520150092",
+   "nomeUfficio": "Tribunale di SIENA ex Tribunale di MONTEPULCIANO"
+  },
+  {
+   "codUfficio": "0890170099",
+   "nomeUfficio": "Tribunale di SIRACUSA"
+  },
+  {
+   "codUfficio": "0140610093",
+   "nomeUfficio": "Tribunale di SONDRIO"
+  },
+  {
+   "codUfficio": "0540510090",
+   "nomeUfficio": "Tribunale di SPOLETO"
+  },
+  {
+   "codUfficio": "0660980092",
+   "nomeUfficio": "Tribunale di SULMONA"
+  },
+  {
+   "codUfficio": "0730270092",
+   "nomeUfficio": "Tribunale di TARANTO"
+  },
+  {
+   "codUfficio": "0900700094",
+   "nomeUfficio": "Tribunale di TEMPIO PAUSANIA"
+  },
+  {
+   "codUfficio": "0670410094",
+   "nomeUfficio": "Tribunale di TERAMO"
+  },
+  {
+   "codUfficio": "0820700094",
+   "nomeUfficio": "Tribunale di TERMINI IMERESE"
+  },
+  {
+   "codUfficio": "0550320091",
+   "nomeUfficio": "Tribunale di TERNI"
+  },
+  {
+   "codUfficio": "0550230092",
+   "nomeUfficio": "Tribunale di TERNI ex Tribunale di ORVIETO"
+  },
+  {
+   "codUfficio": "0581040224",
+   "nomeUfficio": "Tribunale di TIVOLI"
+  },
+  {
+   "codUfficio": "0012720095",
+   "nomeUfficio": "Tribunale di TORINO"
+  },
+  {
+   "codUfficio": "0011910093",
+   "nomeUfficio": "Tribunale di TORINO ex Tribunale di PINEROLO"
+  },
+  {
+   "codUfficio": "0630830098",
+   "nomeUfficio": "Tribunale di TORRE ANNUNZIATA"
+  },
+  {
+   "codUfficio": "0720450099",
+   "nomeUfficio": "Tribunale di TRANI"
+  },
+  {
+   "codUfficio": "0810210090",
+   "nomeUfficio": "Tribunale di TRAPANI"
+  },
+  {
+   "codUfficio": "0222050099",
+   "nomeUfficio": "Tribunale di TRENTO"
+  },
+  {
+   "codUfficio": "0260860099",
+   "nomeUfficio": "Tribunale di TREVISO"
+  },
+  {
+   "codUfficio": "0320060099",
+   "nomeUfficio": "Tribunale di TRIESTE"
+  },
+  {
+   "codUfficio": "0301290097",
+   "nomeUfficio": "Tribunale di UDINE"
+  },
+  {
+   "codUfficio": "0301210091",
+   "nomeUfficio": "Tribunale di UDINE ex Tribunale di TOLMEZZO"
+  },
+  {
+   "codUfficio": "0410670098",
+   "nomeUfficio": "Tribunale di URBINO"
+  },
+  {
+   "codUfficio": "0651540091",
+   "nomeUfficio": "Tribunale di VALLO DELLA LUCANIA"
+  },
+  {
+   "codUfficio": "0121330094",
+   "nomeUfficio": "Tribunale di VARESE"
+  },
+  {
+   "codUfficio": "0690990097",
+   "nomeUfficio": "Tribunale di VASTO"
+  },
+  {
+   "codUfficio": "0581110092",
+   "nomeUfficio": "Tribunale di VELLETRI"
+  },
+  {
+   "codUfficio": "0270420098",
+   "nomeUfficio": "Tribunale di VENEZIA"
+  },
+  {
+   "codUfficio": "1030720094",
+   "nomeUfficio": "Tribunale di VERBANIA"
+  },
+  {
+   "codUfficio": "0021580094",
+   "nomeUfficio": "Tribunale di VERCELLI"
+  },
+  {
+   "codUfficio": "0060390096",
+   "nomeUfficio": "Tribunale di VERCELLI ex Tribunale di CASALE MONTEFERRATO"
+  },
+  {
+   "codUfficio": "0230910097",
+   "nomeUfficio": "Tribunale di VERONA"
+  },
+  {
+   "codUfficio": "1020470090",
+   "nomeUfficio": "Tribunale di VIBO VALENTIA"
+  },
+  {
+   "codUfficio": "0241160092",
+   "nomeUfficio": "Tribunale di VICENZA"
+  },
+  {
+   "codUfficio": "0240120092",
+   "nomeUfficio": "Tribunale di VICENZA ex Tribunale di BASSANO DEL GRAPPA"
+  },
+  {
+   "codUfficio": "0560590098",
+   "nomeUfficio": "Tribunale di VITERBO"
+  }
+ ],
+ "error": null
+}

@@ -1,0 +1,321 @@
+{
+ "messaggio": "Operazione effettuata con successo",
+ "body": {
+  "content": [
+   {
+    "id": 4649048,
+    "tipoLotto": "IMMOBILI",
+    "categoriaLotto": "IMMOBILE_COMMERCIALE",
+    "categoriaBene": [
+     "NEGOZI_BOTTEGHE"
+    ],
+    "indirizzo": {
+     "via": "Via Chiesa, 15, 35021 Anguillara Veneta PD, Italia",
+     "numeroCivico": "",
+     "cap": null,
+     "citta": "Anguillara Veneta",
+     "provincia": "Padova",
+     "coordinate": {
+      "latitudine": 45.161409,
+      "longitudine": 11.96177
+     },
+     "codNazione": null,
+     "codRegione": null,
+     "codProvincia": null,
+     "codComune": null,
+     "idIndirizzo": null,
+     "descComune": null,
+     "descProvincia": null,
+     "descRegione": null,
+     "descNazione": null,
+     "comuneEstero": null
+    },
+    "numeroLotto": "3",
+    "procedura": "93",
+    "prezzoBaseAsta": 71000.0,
+    "dataVendita": "2026-12-17",
+    "orarioVendita": "11:30",
+    "dataOraVendita": "2026-12-17T11:30",
+    "dataPubblicazione": "2026-10-21",
+    "immagine": null,
+    "immagineCover": null,
+    "offertaMinima": 53250.0,
+    "rialzoMinimo": 1000.0,
+    "disponibilita": [
+     "LIBER"
+    ],
+    "descLotto": "Lotto 3 - piena proprietà di un negozio, facente parte di un fabbricato, sito in Comune di Anguillara Veneta (PD), Via Chiesa n. 15, così composto: al piano terra n. 2 ambienti, ognuno con piccolo servizio e affaccio sul viale principale del Comune, dotato di 4 vetrine e di 3 accessi; al piano primo magazzino con terrazza, non collegati agli ambienti del piano terra, raggiungibili esternamente (attualmente tramite l'appartamento al piano primo - Lotto 4); il tutto di mq. 285. Libero.",
+    "descLottoDE": null,
+    "tribunale": "Tribunale di PADOVA",
+    "codiceTribunale": "0280600097",
+    "esito": null
+   },
+   {
+    "id": 4649059,
+    "tipoLotto": "IMMOBILI",
+    "categoriaLotto": "IMMOBILE_RESIDENZIALE",
+    "categoriaBene": [
+     "ABITAZIONE_TIPO_UPOP"
+    ],
+    "indirizzo": {
+     "via": "Via Rovere, 53, 35022 Anguillara Veneta PD, Italia",
+     "numeroCivico": "",
+     "cap": null,
+     "citta": "Anguillara Veneta",
+     "provincia": "Padova",
+     "coordinate": {
+      "latitudine": 45.148045,
+      "longitudine": 11.876421
+     },
+     "codNazione": null,
+     "codRegione": null,
+     "codProvincia": null,
+     "codComune": null,
+     "idIndirizzo": null,
+     "descComune": null,
+     "descProvincia": null,
+     "descRegione": null,
+     "descNazione": null,
+     "comuneEstero": null
+    },
+    "numeroLotto": "2",
+    "procedura": "93",
+    "prezzoBaseAsta": 132000.0,
+    "dataVendita": "2026-12-17",
+    "orarioVendita": "10:45",
+    "dataOraVendita": "2026-12-17T10:45",
+    "dataPubblicazione": "2026-10-21",
+    "immagine": null,
+    "immagineCover": null,
+    "offertaMinima": 99000.0,
+    "rialzoMinimo": 1000.0,
+    "disponibilita": [
+     "OCCUP"
+    ],
+    "descLotto": "Lotto 2: piena proprietà di complesso immobiliare, in Comune di Anguillara Veneta (PD), via Rovere, n. 53, edifici con area coperta e scoperta pertinenziale e annesso terreno, in parte in zona agricola e in parte in zona residenziale C1, raggiungibili dallo stesso accesso promiscuo di proprietà di terzi: Unità A: abitazione e garage; Unità B e C: rudere; Unità D ed E: edificio ad uso ricovero attrezzi; Unità F: manufatto uso ripostiglio; Unità G: manufatto uso ripostiglio-garage. Occupato dal debitore.",
+    "descLottoDE": null,
+    "tribunale": "Tribunale di PADOVA",
+    "codiceTribunale": "0280600097",
+    "esito": null
+   },
+   {
+    "id": 4648963,
+    "tipoLotto": "IMMOBILI",
+    "categoriaLotto": "IMMOBILE_COMMERCIALE",
+    "categoriaBene": [
+     "NEGOZI_BOTTEGHE"
+    ],
+    "indirizzo": {
+     "via": "Via Primo Maggio, 2, 35022 Anguillara Veneta PD, Italia",
+     "numeroCivico": "",
+     "cap": null,
+     "citta": "Anguillara Veneta",
+     "provincia": "Padova",
+     "coordinate": {
+      "latitudine": 45.151186,
+      "longitudine": 11.878016
+     },
+     "codNazione": null,
+     "codRegione": null,
+     "codProvincia": null,
+     "codComune": null,
+     "idIndirizzo": null,
+     "descComune": null,
+     "descProvincia": null,
+     "descRegione": null,
+     "descNazione": null,
+     "comuneEstero": null
+    },
+    "numeroLotto": "1",
+    "procedura": "93",
+    "prezzoBaseAsta": 214000.0,
+    "dataVendita": "2026-12-17",
+    "orarioVendita": "10:00",
+    "dataOraVendita": "2026-12-17T10:00",
+    "dataPubblicazione": "2026-10-21",
+    "immagine": null,
+    "immagineCover": null,
+    "offertaMinima": 160500.0,
+    "rialzoMinimo": 2000.0,
+    "disponibilita": [
+     "OCCST"
+    ],
+    "descLotto": "Lotto 1 - piena proprietà di fabbricato commerciale, sito in Comune di Anguillara Veneta (PD) in via Primo Maggio n. 2, in stato di abbandono e di degrado, già adibito a ristorante-pizzeria con 260 posti a sedere, sviluppato su 3 livelli, piano interrato, piano terra e piano primo con grande terrazzo a copertura del piano primo, per una superficie commerciale di mq. 1.242, oltre al diritto di superficie, su parte dell'area scoperta che circonda il fabbricato, di catastali mq. 1147. Occupato senza titolo.",
+    "descLottoDE": null,
+    "tribunale": "Tribunale di PADOVA",
+    "codiceTribunale": "0280600097",
+    "esito": null
+   },
+   {
+    "id": 4545235,
+    "tipoLotto": "IMMOBILI",
+    "categoriaLotto": "IMMOBILE_COMMERCIALE",
+    "categoriaBene": [
+     "NEGOZI_BOTTEGHE"
+    ],
+    "indirizzo": {
+     "via": "Via Chiesa, 15, 35021 Anguillara Veneta PD, Italia",
+     "numeroCivico": "",
+     "cap": null,
+     "citta": "Anguillara Veneta",
+     "provincia": "Padova",
+     "coordinate": {
+      "latitudine": 45.161409,
+      "longitudine": 11.96177
+     },
+     "codNazione": null,
+     "codRegione": null,
+     "codProvincia": null,
+     "codComune": null,
+     "idIndirizzo": null,
+     "descComune": null,
+     "descProvincia": null,
+     "descRegione": null,
+     "descNazione": null,
+     "comuneEstero": null
+    },
+    "numeroLotto": "3",
+    "procedura": "93",
+    "prezzoBaseAsta": 94500.0,
+    "dataVendita": "2026-05-21",
+    "orarioVendita": "11:30",
+    "dataOraVendita": "2026-05-21T11:30",
+    "dataPubblicazione": "2026-03-13",
+    "immagine": null,
+    "immagineCover": null,
+    "offertaMinima": 70875.0,
+    "rialzoMinimo": 1000.0,
+    "disponibilita": [
+     "LIBER"
+    ],
+    "descLotto": "Lotto 3 - piena proprietà di un negozio, facente parte di un fabbricato, sito in Comune di Anguillara Veneta (PD), Via Chiesa n. 15, così composto: al piano terra n. 2 ambienti, ognuno con piccolo servizio e affaccio sul viale principale del Comune, dotato di 4 vetrine e di 3 accessi; al piano primo magazzino con terrazza, non collegati agli ambienti del piano terra, raggiungibili esternamente (attualmente tramite l'appartamento al piano primo - Lotto 4); il tutto di mq. 285. Libero.",
+    "descLottoDE": null,
+    "tribunale": "Tribunale di PADOVA",
+    "codiceTribunale": "0280600097",
+    "esito": "ASDES"
+   },
+   {
+    "id": 4545284,
+    "tipoLotto": "IMMOBILI",
+    "categoriaLotto": "IMMOBILE_RESIDENZIALE",
+    "categoriaBene": [
+     "ABITAZIONE_TIPO_UPOP"
+    ],
+    "indirizzo": {
+     "via": "Via Rovere, 53, 35022 Anguillara Veneta PD, Italia",
+     "numeroCivico": "",
+     "cap": null,
+     "citta": "Anguillara Veneta",
+     "provincia": "Padova",
+     "coordinate": {
+      "latitudine": 45.148045,
+      "longitudine": 11.876421
+     },
+     "codNazione": null,
+     "codRegione": null,
+     "codProvincia": null,
+     "codComune": null,
+     "idIndirizzo": null,
+     "descComune": null,
+     "descProvincia": null,
+     "descRegione": null,
+     "descNazione": null,
+     "comuneEstero": null
+    },
+    "numeroLotto": "2",
+    "procedura": "93",
+    "prezzoBaseAsta": 176000.0,
+    "dataVendita": "2026-05-21",
+    "orarioVendita": "10:45",
+    "dataOraVendita": "2026-05-21T10:45",
+    "dataPubblicazione": "2026-03-13",
+    "immagine": null,
+    "immagineCover": null,
+    "offertaMinima": 132000.0,
+    "rialzoMinimo": 1000.0,
+    "disponibilita": [
+     "OCCUP"
+    ],
+    "descLotto": "Lotto 2: piena proprietà di complesso immobiliare, in Comune di Anguillara Veneta (PD), via Rovere, n. 53, edifici con area coperta e scoperta pertinenziale e annesso terreno, in parte in zona agricola e in parte in zona residenziale C1, raggiungibili dallo stesso accesso promiscuo di proprietà di terzi: Unità A: abitazione e garage; Unità B e C: rudere; Unità D ed E: edificio ad uso ricovero attrezzi; Unità F: manufatto uso ripostiglio; Unità G: manufatto uso ripostiglio-garage. Occupato dal debitore.",
+    "descLottoDE": null,
+    "tribunale": "Tribunale di PADOVA",
+    "codiceTribunale": "0280600097",
+    "esito": "ASDES"
+   },
+   {
+    "id": 4545157,
+    "tipoLotto": "IMMOBILI",
+    "categoriaLotto": "IMMOBILE_COMMERCIALE",
+    "categoriaBene": [
+     "NEGOZI_BOTTEGHE"
+    ],
+    "indirizzo": {
+     "via": "Via Primo Maggio, 2, 35022 Anguillara Veneta PD, Italia",
+     "numeroCivico": "",
+     "cap": null,
+     "citta": "Anguillara Veneta",
+     "provincia": "Padova",
+     "coordinate": {
+      "latitudine": 45.151186,
+      "longitudine": 11.878016
+     },
+     "codNazione": null,
+     "codRegione": null,
+     "codProvincia": null,
+     "codComune": null,
+     "idIndirizzo": null,
+     "descComune": null,
+     "descProvincia": null,
+     "descRegione": null,
+     "descNazione": null,
+     "comuneEstero": null
+    },
+    "numeroLotto": "1",
+    "procedura": "93",
+    "prezzoBaseAsta": 285000.0,
+    "dataVendita": "2026-05-21",
+    "orarioVendita": "10:00",
+    "dataOraVendita": "2026-05-21T10:00",
+    "dataPubblicazione": "2026-03-13",
+    "immagine": null,
+    "immagineCover": null,
+    "offertaMinima": 213750.0,
+    "rialzoMinimo": 2000.0,
+    "disponibilita": [
+     "OCCST"
+    ],
+    "descLotto": "Lotto 1 - piena proprietà di fabbricato commerciale, sito in Comune di Anguillara Veneta (PD) in via Primo Maggio n. 2, in stato di abbandono e di degrado, già adibito a ristorante-pizzeria con 260 posti a sedere, sviluppato su 3 livelli, piano interrato, piano terra e piano primo con grande terrazzo a copertura del piano primo, per una superficie commerciale di mq. 1.242, oltre al diritto di superficie, su parte dell'area scoperta che circonda il fabbricato, di catastali mq. 1147. Occupato senza titolo.",
+    "descLottoDE": null,
+    "tribunale": "Tribunale di PADOVA",
+    "codiceTribunale": "0280600097",
+    "esito": "ASDES"
+   }
+  ],
+  "pageable": {
+   "sort": {
+    "empty": false,
+    "sorted": true,
+    "unsorted": false
+   },
+   "offset": 0,
+   "pageNumber": 0,
+   "pageSize": 50,
+   "paged": true,
+   "unpaged": false
+  },
+  "totalPages": 1,
+  "totalElements": 6,
+  "last": true,
+  "size": 50,
+  "number": 0,
+  "sort": {
+   "empty": false,
+   "sorted": true,
+   "unsorted": false
+  },
+  "numberOfElements": 6,
+  "first": true,
+  "empty": false
+ },
+ "error": null
+}
