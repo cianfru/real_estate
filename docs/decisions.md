@@ -12,7 +12,7 @@
 | D6 | Denormalised "current round" columns on `lotti` | list and map need one indexed table at ~18k lots |
 | D7 | Sync SQLAlchemy + FastAPI sync endpoints | low traffic (2–5 users); simpler code and tests |
 | D8 | Session = JWT in an httpOnly cookie; mutating requests need `X-Requested-With: fetch` | simple CSRF protection that also works if the API is on another site |
-| D9 | Frontend calls `/api/*` on its own origin; Vercel rewrites to Railway | first-party cookies, `SameSite=Lax`, no third-party cookie issues |
+| D9 | One container serves the React app at `/` and the API at `/api` (`app.server`); the browser only talks to its own origin | first-party cookies, `SameSite=Lax`, no proxy, one service to deploy |
 | D10 | Map clustering in MapLibre, not server-side | ≤ 20k points as compact GeoJSON (~1.5 MB, gzip ~300 KB) |
 | D11 | `STORE_PROFESSIONAL_CONTACTS=false` by default; SOGGSPV (viewing contact) included when on; judges never | pending decision by the firm, data minimisation |
 | D12 | No PDF mirroring; link to `resource-pvp.giustizia.it` | perizie may contain personal data |
@@ -28,6 +28,7 @@
 | D22 | Market history (`storico_vendite`) from search pages only, ≈ 500 requests one-off, then from the nightly list | details for 250k sales would take days of PVP traffic |
 | D23 | PVP's 2025 coverage hole is detected from the data; first sales in the 12 months after it are not used as appraisals and the index shows a gap | otherwise reduced rounds read as low appraisals and fake a −39% trend |
 | D24 | Price index = rolling 12-month median per quarter, ≥ 3 own and ≥ 8 window observations, never across a gap | provinces have 20–40 priced sales a quarter; raw quarters are noise |
+| D25 | Hosting: Railway Hobby (web + nightly cron from one image) and Neon free for Postgres/PostGIS; no Vercel | Vercel's Hobby plan is "restricted to non-commercial personal use only" (Fair Use Guidelines) and Pro is paid per member; the firm already has Railway Hobby |
 
 ## Known limitations
 

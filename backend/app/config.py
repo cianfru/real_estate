@@ -13,10 +13,13 @@ class Settings(BaseSettings):
     jwt_ttl_hours: int = 24 * 14
     cookie_name: str = "le_session"
     cookie_secure: bool = False
-    # "lax" when the frontend proxies /api through the same origin (recommended),
-    # "none" when frontend and API live on different sites.
+    # "lax" when the frontend and the API share an origin (production: app.server serves both),
+    # "none" only if they ever live on different sites.
     cookie_samesite: str = "lax"
     cors_origins: str = "http://localhost:5173"
+
+    # Built React app (frontend/dist) served by app.server at /. Set in the Docker image.
+    frontend_dir: str = ""
 
     # GDPR: delegato/custode names and contacts are only stored when this is on.
     store_professional_contacts: bool = False

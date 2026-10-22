@@ -3,54 +3,81 @@
 ## Architecture
 
 ```
-Vercel (frontend, static)  ──/api/* rewrite──▶  Railway "api" service (FastAPI, Docker)
-                                                     │
-Railway "cron" service (same image) ── nightly ──▶   Postgres 16 + PostGIS (Neon free tier or Railway)
-       python -m ingest nightly --scope italy          ▲
-                    │                                   │
-                    ├─▶ pvp.giustizia.it (≈ 1 req/s)    │
-                    ├─▶ nominatim.openstreetmap.org     │
-                    └─▶ api.resend.com (alert emails)   │
+                 https://<app>.up.railway.app (or your domain)
+                                   │
+Railway "web" service ── one Docker image (root Dockerfile) ──────────────┐
+   app.server: React app at /, FastAPI at /api, /health                    │
+                                                                          ▼
+Railway "cron" service ── same image, 01:17 UTC ──────────▶  Postgres 16 + PostGIS
+   python -m ingest nightly --scope italy                   (Neon free tier, Frankfurt)
+        ├─▶ pvp.giustizia.it (≈ 1 req/s)
+        ├─▶ nominatim.openstreetmap.org
+        └─▶ api.resend.com (alert emails)
 ```
 
-Expected cost: Neon free tier (0.5 GB is ample: the national dataset is ~150 MB) + Railway Hobby
-($5/month, which includes $5 of usage; the API idles at a few cents a day and the cron runs ~20
-minutes a night) + Vercel Hobby (free) + Resend free (3,000 emails/month). **≈ €5/month.**
-Fully free alternative: run the nightly job on GitHub Actions (`.github/workflows/nightly-sync.yml`,
-set the repo variable `NIGHTLY_ON_GITHUB=true`) and host the API on any free container host.
+The website and the API share one origin, so the session cookie is first-party and nothing has
+to proxy the API (decision D9). Vercel is not used: its free plan is for non-commercial use only
+(D25).
+
+Expected cost: **Railway Hobby, $5/month**, which includes $5 of usage. The web service idles at
+~100 MB of memory and the nightly job runs ~30 minutes (peak ~600 MB during the analysis), which
+should stay within the included usage; check *Usage* in Railway after the first month. Neon free
+tier (0.5 GB; the national dataset is ~170 MB) and Resend free (3,000 emails/month) cost nothing.
+Free alternative for the nightly job: GitHub Actions (`.github/workflows/nightly-sync.yml`, repo
+variable `NIGHTLY_ON_GITHUB=true`), with the Railway cron service removed.
 
 ## First deployment
 
-1. **Database.** Create a Neon project (region Frankfurt) and run `CREATE EXTENSION postgis;`
-   once, or add Railway's PostGIS template. Copy the connection string.
-2. **API on Railway.** New service from this GitHub repo, root directory `backend`, config file
-   `backend/railway.json`. Variables: see `backend/.env.example` (at least `DATABASE_URL`,
-   `JWT_SECRET`, `PUBLIC_APP_URL`, `COOKIE_SECURE=true`). Migrations run on start.
-   Generate a domain, check `https://<api>/health` returns `{"status":"ok"}`.
-3. **Cron on Railway.** Second service from the same repo, root `backend`, config file
-   `backend/railway.cron.json` (start command `python -m ingest nightly --scope italy`, schedule
-   `17 1 * * *` UTC ≈ 03:17 Rome in summer / 02:17 in winter). Same variables as the API
-   (share them with a Railway variable group).
-4. **Frontend on Vercel.** Import the repo, root directory `frontend`. Edit `frontend/vercel.json`:
-   replace `REPLACE-WITH-YOUR-API.up.railway.app` with the API domain. No env vars needed.
-   Set `PUBLIC_APP_URL` on Railway to the Vercel URL.
-5. **Staff users.** From your machine with `DATABASE_URL` pointing at production:
+1. **Database (Neon, free).** Create a project in region *AWS Europe Central 1 (Frankfurt)*.
+   In the SQL editor run `CREATE EXTENSION IF NOT EXISTS postgis;`. Copy the connection string
+   with **connection pooling off** (the direct one, `...neon.tech/neondb?sslmode=require`): the
+   app keeps its own pool, and psycopg's prepared statements don't go through PgBouncer.
+   (Alternative: Railway's PostGIS template in the same project, billed as usage.)
+2. **Web service.** Railway → *New project* → *Deploy from GitHub repo* → this repository. Railway
+   reads `railway.json` at the root and builds the root `Dockerfile` (frontend + API, ~3 minutes).
+   Rename the service `web`. In *Settings → Source* pick the branch to deploy. *Variables*:
+
+   | variable | value |
+   |---|---|
+   | `DATABASE_URL` | the Neon string (`postgres://` or `postgresql://` both work) |
+   | `JWT_SECRET` | 64 random characters, e.g. `openssl rand -hex 32` |
+   | `COOKIE_SECURE` | `true` |
+   | `PUBLIC_APP_URL` | `https://<the domain from the next step>` (used in share links and emails) |
+   | `NOMINATIM_EMAIL` | the firm's address (Nominatim's usage policy asks for a contact) |
+   | `RESEND_API_KEY`, `EMAIL_FROM` | optional, see step 7 |
+
+   *Settings → Networking → Generate domain* (or add `aste.legalestateitalia.it` as a custom
+   domain). Migrations run at every start. Check `https://<domain>/health` → `{"status":"ok"}`.
+3. **Cron service.** In the same project: *New → GitHub repo* → the same repository. Rename it
+   `cron`. *Settings → Config-as-code*: Railway config file `/railway.cron.json` (start command
+   `python -m ingest nightly --scope italy`, schedule `17 1 * * *` UTC ≈ 03:17 Rome in summer,
+   02:17 in winter). Same branch as `web`. *Variables*: reference the web service's, e.g.
+   `DATABASE_URL=${{web.DATABASE_URL}}`, and the same for `JWT_SECRET`, `PUBLIC_APP_URL`,
+   `NOMINATIM_EMAIL`, `RESEND_API_KEY`, `EMAIL_FROM`.
+4. **Staff users.** With the Railway CLI (`npm i -g @railway/cli`, `railway login`,
+   `railway link`):
    ```
-   cd backend && pip install -e .
+   railway ssh --service web
    python -m ingest create-user avv.vella@legalestateitalia.it "Mariagiovanna Vella" --admin
    python -m ingest create-user collaboratore@legalestateitalia.it "Nome Cognome"
    ```
-   (or `railway run python -m ingest create-user ...`). The password is prompted (min 10 chars).
-   Running the command again for an existing email resets the password.
-6. **First sync.** Admin page → "Avvia sincronizzazione" (Italia), or
-   `railway run python -m ingest sync --scope italy`. It takes ~20 minutes (≈ 1,000 PVP
-   requests). The first sync is a silent *bootstrap*: no events, no alert emails.
-7. **Market history.** Once, after the first sync:
-   `railway run python -m ingest history --scope italy --since 2019-01-01` (≈ 500 PVP requests,
-   about 10 minutes), then `python -m ingest analytics` (≈ 20 s). The Mercato page and the zone
-   layer stay empty until this has run. The first analytics run is silent (no opportunity events).
-8. **Resend.** Verify the sending domain (`legalestateitalia.it`) in Resend, then set
-   `RESEND_API_KEY` and `EMAIL_FROM`. Without a key, alerts are written to the log.
+   The password is prompted (min 10 characters). Running the command again for an existing
+   email resets the password.
+5. **First sync.** Log in → Admin → "Avvia sincronizzazione" (Italia). ~20 minutes, ≈ 1,000 PVP
+   requests. The first sync is a silent *bootstrap*: no events, no alert emails.
+6. **Market history**, once, from `railway ssh --service web`:
+   ```
+   nohup sh -c 'python -m ingest history --scope italy --since 2019-01-01 && python -m ingest analytics' > /tmp/history.log 2>&1 &
+   ```
+   ≈ 500 PVP requests, about 10 minutes, then ≈ 30 s of analysis (`tail -f /tmp/history.log`; it
+   keeps running if the SSH session drops). Until this has run the Mercato page and the zone layer
+   are empty. The first analysis with data is silent (no opportunity events).
+7. **Resend (optional).** Verify the sending domain (`legalestateitalia.it`) in Resend, then set
+   `RESEND_API_KEY` and `EMAIL_FROM` on `web` (the cron references them). Without a key, alerts
+   are written to the log.
+
+Every push to the deployed branch rebuilds both services (docs-only changes don't, see
+`watchPatterns` in `railway.json`).
 
 ## Daily operation
 

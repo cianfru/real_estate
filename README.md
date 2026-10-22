@@ -58,8 +58,9 @@ default `postgresql+psycopg://postgres@localhost:5432/aste_test`) and `cd fronte
 
 ## Deploy
 
-See [docs/runbook.md](docs/runbook.md): Railway (API + nightly cron), Neon or Railway Postgres
-with PostGIS, Vercel (frontend). About €5/month.
+One Docker image (root `Dockerfile`) serves the website and the API; Railway runs it as the web
+service and as the nightly cron, with Postgres + PostGIS on Neon's free tier. About $5/month (the
+Railway Hobby plan). Step by step: [docs/runbook.md](docs/runbook.md).
 
 ## Ground rules
 

@@ -1,8 +1,8 @@
-# Local stack: Postgres 16 + PostGIS and the API.
-#   docker compose up -d
+# Local stack: Postgres 16 + PostGIS and the production image (website + API).
+#   docker compose up -d                               -> http://localhost:8000
 #   docker compose exec api python -m ingest create-user you@studio.it "Nome" --admin
 #   docker compose exec api python -m ingest sync --scope veneto
-#   cd frontend && npm install && npm run dev        -> http://localhost:5173
+# For frontend work with hot reload: cd frontend && npm install && npm run dev -> :5173
 services:
   db:
     image: postgis/postgis:16-3.4
@@ -17,13 +17,13 @@ services:
       retries: 10
 
   api:
-    build: ./backend
+    build: .
     depends_on:
       db: { condition: service_healthy }
     environment:
       DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/aste
       JWT_SECRET: dev-only-secret-change-me-in-production-please
-      PUBLIC_APP_URL: http://localhost:5173
+      PUBLIC_APP_URL: http://localhost:8000
     ports: ["8000:8000"]
 
 volumes:

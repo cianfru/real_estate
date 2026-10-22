@@ -1,0 +1,53 @@
+from pathlib import Path
+from typing import Any
+
+import pytest
+from fastapi.testclient import TestClient
+
+from app.auth import hash_password
+from app.models import User
+from app.server import create_site
+
+H = {"X-Requested-With": "fetch"}
+
+
+@pytest.fixture
+def dist(tmp_path: Path) -> Path:
+    (tmp_path / "assets").mkdir()
+    (tmp_path / "index.html").write_text("<!doctype html><title>shell</title>")
+    (tmp_path / "assets" / "index-abc123.js").write_text("console.log(1)")
+    (tmp_path / "robots.txt").write_text("User-agent: *\nDisallow: /\n")
+    return tmp_path
+
+
+def test_app_shell_assets_and_api_share_one_origin(dist: Path, db: Any) -> None:
+    db.add(User(email="avv@example.org", name="Avvocata", password_hash=hash_password("password-lunga")))
+    db.commit()
+    c = TestClient(create_site(dist))
+
+    for path in ("/", "/mercato", "/lotti/12", "/s/abc"):
+        r = c.get(path)
+        assert r.status_code == 200 and "shell" in r.text, path
+        assert r.headers["cache-control"] == "no-cache"
+        assert r.headers["x-frame-options"] == "DENY" and r.headers["x-robots-tag"] == "noindex, nofollow"
+
+    r = c.get("/assets/index-abc123.js")
+    assert r.status_code == 200 and "immutable" in r.headers["cache-control"]
+    assert c.get("/assets/missing.js").status_code == 404
+    assert c.get("/robots.txt").text.startswith("User-agent")
+    assert "shell" in c.get("/%2e%2e/%2e%2e/etc/passwd").text  # never a file outside the build
+
+    # the API lives under /api, with its own auth and CSRF rules
+    assert c.get("/api/lotti").status_code == 401
+    assert c.post("/api/auth/login", json={"email": "avv@example.org", "password": "password-lunga"}).status_code == 403
+    login = {"email": "avv@example.org", "password": "password-lunga"}
+    assert c.post("/api/auth/login", json=login, headers=H).status_code == 200
+    assert c.get("/api/lotti").status_code == 200
+    assert c.get("/api/nope").status_code == 404
+    assert c.get("/health").json() == {"status": "ok"}
+
+
+def test_without_a_build_only_the_api_is_served(tmp_path: Path) -> None:
+    c = TestClient(create_site(tmp_path))
+    assert c.get("/").status_code == 404
+    assert c.get("/api/lotti").status_code == 401

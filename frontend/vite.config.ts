@@ -4,8 +4,8 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "node:path";
 
-// In development /api is proxied to FastAPI; in production Vercel rewrites /api to Railway
-// (see vercel.json), so the session cookie stays first-party.
+// In development /api is proxied to FastAPI; in production the same container serves this build
+// and the API under /api (backend/app/server.py), so the session cookie stays first-party.
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: { alias: { "@": path.resolve(__dirname, "src") } },
