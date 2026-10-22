@@ -18,6 +18,20 @@
 | D12 | No PDF mirroring; link to `resource-pvp.giustizia.it` | perizie may contain personal data |
 | D13 | Geocoding only where PVP gave no coordinates; Nominatim 1 req/s; comune centroid fallback shown as a hollow marker | zero cost; honest about precision |
 | D14 | Valore di stima extracted from the description text when stated | PVP has no structured field |
+| D15 | Photo passthrough `/public/img` restricted to `/immagini-beni/` images, nothing stored | PVP's bucket headers make photos unembeddable (ORB); documents stay plain links |
+| D16 | First sync is a silent bootstrap; `first_seen` = PVP publication date | otherwise the first alert digest would list 17,000 lots and "new in 7 days" would be meaningless |
+| D17 | Sales without a court grouped under pseudo-tribunale `ESATTORIALE` | ~275 tax-collector auctions have no `codiceTribunale` |
+| D18 | Geocoding tries free text, then structured street + city, then the street without number, then the comune centroid | PVP addresses carry noise ("n.civ presunto", "lotto 2E", several streets) |
+
+## Known limitations
+
+- **Geocoding precision.** Public Nominatim misses many Italian civic addresses. In the dev
+  sandbox (shared egress IP, probably throttled) 43 of 488 active Veneto lots ended on the comune
+  centroid (hollow markers). From the production server it should do better; if not, a paid
+  geocoder can be plugged in through the `Geocoder` protocol (`ingest/geocode.py`), which would
+  add a running cost and needs the firm's OK.
+- The national backlog of ~6,700 lots without coordinates drains at `GEOCODE_LIMIT` (800) per
+  night, Veneto first.
 
 ## Pending (need the firm's input)
 

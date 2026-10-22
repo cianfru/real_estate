@@ -184,13 +184,14 @@ class FakeGeocoder:
     name = "nominatim"
 
     def __init__(self) -> None:
-        self.queries: list[str] = []
+        self.queries: list[Any] = []
 
-    def geocode(self, query: str) -> GeoResult | None:
+    def geocode(self, query: Any) -> GeoResult | None:
         self.queries.append(query)
-        if query.startswith("via inesistente"):
+        text = query if isinstance(query, str) else query["street"]
+        if "inesistente" in text.lower():
             return None
-        return GeoResult(45.4, 11.87, 0.35 if "Italia" in query and query.count(",") == 2 else 0.8)
+        return GeoResult(45.4, 11.87, 0.8)
 
 
 def test_geocode_with_comune_fallback_and_cache(db: Any, client: Any, fake_pvp: FakePvp) -> None:

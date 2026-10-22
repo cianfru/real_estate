@@ -11,6 +11,12 @@ of the **Portale delle Vendite Pubbliche** (`pvp.giustizia.it`), at near-zero ru
 - Internal notes, client links, read-only share links for clients
 - Saved searches with a morning email digest of new lots, new rounds and price drops
 
+![Map and property card](docs/screenshots/map-and-card.jpg)
+
+More: [property page](docs/screenshots/property-page.jpg) ·
+[client share page](docs/screenshots/client-share-page.jpg) ·
+[dark mode](docs/screenshots/dark-mode.jpg) · [mobile](docs/screenshots/mobile.jpg)
+
 ## Repository
 
 ```

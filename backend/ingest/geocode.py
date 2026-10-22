@@ -31,10 +31,14 @@ class GeoResult:
     confidence: float
 
 
+# A query is free text, or a dict of Nominatim structured-search fields (street, city, ...).
+Query = str | dict[str, str]
+
+
 class Geocoder(Protocol):
     name: str
 
-    def geocode(self, query: str) -> GeoResult | None: ...
+    def geocode(self, query: Query) -> GeoResult | None: ...
 
 
 class NominatimGeocoder:
@@ -45,16 +49,27 @@ class NominatimGeocoder:
         self.http = httpx.Client(timeout=30, headers={"User-Agent": self.settings.pvp_user_agent}, transport=transport)
         self._last = 0.0
 
-    def geocode(self, query: str) -> GeoResult | None:
-        wait = 1.05 - (time.monotonic() - self._last)
-        if wait > 0:
-            time.sleep(wait)
-        self._last = time.monotonic()
-        params = {"q": query, "format": "jsonv2", "countrycodes": "it", "limit": "1"}
+    def _get(self, params: dict[str, str]) -> httpx.Response:
+        for attempt in range(2):
+            wait = 1.05 - (time.monotonic() - self._last)
+            if wait > 0:
+                time.sleep(wait)
+            self._last = time.monotonic()
+            r = self.http.get(self.settings.nominatim_url, params=params)
+            if r.status_code == 429 and attempt == 0:
+                log.warning("nominatim 429, backing off 30 s")
+                time.sleep(30)
+                continue
+            return r
+        return r
+
+    def geocode(self, query: Query) -> GeoResult | None:
+        params = {"format": "jsonv2", "countrycodes": "it", "limit": "1"}
+        params.update({"q": query} if isinstance(query, str) else query)
         if self.settings.nominatim_email:
             params["email"] = self.settings.nominatim_email
         try:
-            r = self.http.get(self.settings.nominatim_url, params=params)
+            r = self._get(params)
             r.raise_for_status()
             data = r.json()
         except (httpx.HTTPError, ValueError) as e:
@@ -96,7 +111,11 @@ _ABBREV = [
     (r"\bs\.\s*p\.\s*(?=\d)", "strada provinciale "),
 ]
 _NOISE = [
-    r"\b(snc|s\.n\.c\.)\b",
+    r"\bs\.?\s*n\.?\s*c\.?(?=\W|$)",
+    r"\bsnc\b",
+    r"\blotto\s+\w+",
+    r"\bn\.?\s*civ(ico)?\.?(\s+presunto)?",
+    r"\bsez\.\s*\w+",
     r"\bpiano\s+\S+",
     r"\b(int(erno)?|scala|sc\.)\s*\.?\s*\w+",
     r"\bn\.\s*(?=\d)",
@@ -105,10 +124,11 @@ _NOISE = [
 ]
 
 
-def normalise_address(via: str | None, comune: str | None, provincia: str | None, cap: str | None) -> str | None:
-    """Build a Nominatim query from PVP's free-text address fields."""
-    if not comune and not via:
-        return None
+_STREET_WORDS = r"(via|viale|vicolo|piazza|piazzale|corso|largo|strada|localita|località|contrada|borgo|riviera)"
+
+
+def clean_street(via: str | None, comune: str | None, cap: str | None) -> str:
+    """The street part of PVP's free-text 'via', normalised for Nominatim (lower case)."""
     street = (via or "").strip()
     # PVP sometimes stores a full Google-formatted address in 'via': keep only the street part.
     if comune and comune.lower() in street.lower() and "," in street:
@@ -120,13 +140,52 @@ def normalise_address(via: str | None, comune: str | None, provincia: str | None
             keep.append(part.strip())
         street = ", ".join(keep) or street.split(",")[0]
     s = street.lower()
+    # "località X, in via Y 11" / "lungo via Y" / "nelle vicinanze di via Y": keep the street
+    m = re.search(r"(?:\b(?:in|lungo|nelle vicinanze di)\s+)(" + _STREET_WORDS + r"\b.*)", s)
+    if m:
+        s = m.group(1)
+    # several streets ("via A 1 e via B 9", "via A, piazza B, viale C"): keep the first
+    s = re.split(r"\s+e\s+(?=" + _STREET_WORDS + r"\b)|\s+-\s+", s)[0]
+    s = re.sub(r",\s*(?=\d)", " ", s)  # "via atene, 88" -> "via atene 88"
+    parts = [p.strip() for p in s.split(",") if p.strip()]
+    if len(parts) > 1:
+        s = next((p for p in parts if re.match(_STREET_WORDS, p)), parts[0])
     for pat, rep in _ABBREV:
         s = re.sub(pat, rep, s)
     for pat in _NOISE:
         s = re.sub(pat, " ", s)
-    s = re.sub(r"\s+", " ", s).strip(" ,.-")
+    s = re.sub(r"(\d+)(?:\s*-\s*\d+)+", r"\1", s)  # "3-6-8" -> "3"
+    return re.sub(r"\s+", " ", s).strip(" ,.-")
+
+
+def normalise_address(via: str | None, comune: str | None, provincia: str | None, cap: str | None) -> str | None:
+    """Free-text Nominatim query from PVP's address fields."""
+    if not comune and not via:
+        return None
+    s = clean_street(via, comune, cap)
     parts = [p for p in (s, " ".join(x for x in (cap, comune) if x), provincia, "Italia") if p]
     return ", ".join(parts)
+
+
+def street_queries(
+    via: str | None, comune: str | None, provincia: str | None, cap: str | None
+) -> list[tuple[Query, float]]:
+    """Attempts in order, each with the maximum confidence it can earn: free text, structured
+    street + city, then the street without its civic number (road level)."""
+    street = clean_street(via, comune, cap)
+    if not street or not comune:
+        return []
+    out: list[tuple[Query, float]] = []
+    free = normalise_address(via, comune, provincia, cap)
+    if free:
+        out.append((free, 1.0))
+    # structured search wants "<housenumber> <street>"
+    m = re.match(r"^(.*?)\s+(\d+\s*/?\s*[a-z]?)$", street)
+    name, number = (m.group(1), m.group(2).replace(" ", "")) if m else (street, None)
+    out.append(({"street": f"{number} {name}" if number else name, "city": comune, "country": "Italia"}, 1.0))
+    if number:
+        out.append(({"street": name, "city": comune, "country": "Italia"}, 0.6))
+    return out
 
 
 def comune_query(comune: str | None, provincia: str | None) -> str | None:
@@ -138,8 +197,14 @@ def comune_query(comune: str | None, provincia: str | None) -> str | None:
 # ------------------------------------------------------------------ runner
 
 
-def _cached(db: Session, geocoder: Geocoder, query: str, source: str) -> GeoResult | None:
-    key = query.lower()
+def _cache_key(query: Query) -> str:
+    if isinstance(query, str):
+        return query.lower()
+    return "s:" + "|".join(f"{k}={v.lower()}" for k, v in sorted(query.items()))
+
+
+def _cached(db: Session, geocoder: Geocoder, query: Query, source: str) -> GeoResult | None:
+    key = _cache_key(query)
     hit = db.get(GeocodeCache, key)
     if hit is not None:
         return GeoResult(hit.lat, hit.lon, hit.confidence or 0) if hit.lat is not None and hit.lon is not None else None
@@ -183,9 +248,11 @@ def geocode_missing(
         counts["candidates"] += 1
         try:
             res, source = None, geocoder.name
-            query = normalise_address(lot.indirizzo, lot.comune, lot.provincia, lot.cap)
-            if query and lot.indirizzo:
+            for query, max_conf in street_queries(lot.indirizzo, lot.comune, lot.provincia, lot.cap):
                 res = _cached(db, geocoder, query, geocoder.name)
+                if res is not None:
+                    res = GeoResult(res.lat, res.lon, min(res.confidence, max_conf))
+                    break
             if res is None:
                 cq = comune_query(lot.comune, lot.provincia)
                 if cq:

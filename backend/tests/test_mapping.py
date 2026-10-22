@@ -2,7 +2,7 @@ from decimal import Decimal
 
 import pytest
 
-from ingest.geocode import normalise_address
+from ingest.geocode import clean_street, normalise_address, street_queries
 from ingest.mapping import (
     classify_attachment,
     extract_valore_stima,
@@ -106,8 +106,17 @@ def test_classify_attachment() -> None:
     assert classify_attachment("ALTRO", "Varie", "z.zip", "/allegati/1/z.zip") == "other"
 
 
+def test_street_queries_clean_pvp_free_text() -> None:
+    qs = [q for q, _ in street_queries("via G. Soster 1 e via Duca d'Aosta 9", "Valdagno", "Vicenza", "36078")]
+    assert qs[1] == {"street": "1 via g. soster", "city": "Valdagno", "country": "Italia"}
+    assert qs[2] == {"street": "via g. soster", "city": "Valdagno", "country": "Italia"}
+    assert clean_street("localita' Belvedere, in via A. Moro 11", "Tezze", None) == "via a. moro 11"
+    assert clean_street("via Cesare Battisti n.civ presunto 47", "San Vito", None) == "via cesare battisti 47"
+    assert clean_street("via Colombara 5 - lotto 2E", "Chiampo", None) == "via colombara 5"
+
+
 def test_normalise_address() -> None:
     q = normalise_address("V.le della Repubblica n. 12 piano 2 int. 4", "Padova", "Padova", "35100")
     assert q == "viale della repubblica 12, 35100 Padova, Padova, Italia"
     q2 = normalise_address("Via Atene, 88, 06083 Bastia Umbra PG, Italia", "Bastia Umbra", "Perugia", "06083")
-    assert q2 == "via atene, 88, 06083 Bastia Umbra, Perugia, Italia"
+    assert q2 == "via atene 88, 06083 Bastia Umbra, Perugia, Italia"

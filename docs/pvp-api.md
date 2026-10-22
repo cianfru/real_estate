@@ -80,6 +80,11 @@ The search payload is a Spring `Page`: `content[]`, `totalElements`, `totalPages
   radius). We always filter by tribunale, never by radius.
 - **No RGE year in search results.** `procedura` is only the number (`"93"`). The year is only in
   the detail. See "Lot identity" in `data-model.md`.
+- **Sales without a court.** ~275 upcoming sales (Agenzia Entrate-Riscossione, "esecuzioni
+  esattoriali") have empty `codiceTribunale`/`tribunale` and `procedura.codUfficio = null`. We file
+  them under the pseudo-tribunale `ESATTORIALE` ("Vendite esattoriali (senza tribunale)").
+- Several lots of the same procedure often share the exact same coordinates (same building).
+  The map layer fans duplicates out on a ~25 m ring so each stays clickable.
 - Filtering by `"Tribunale di VICENZA"` also matches the ex-Bassano court (substring match);
   `codiceTribunale` in each row is reliable.
 
@@ -150,6 +155,17 @@ the procedure, past ones with their `esito` (`Syncer.history_sync`).
 (photos under `/immagini-beni/...`). Public, supports range requests. We store the path and link to
 it; we never download or mirror the PDFs.
 
+**Photos cannot be embedded directly.** The bucket serves everything as
+`application/octet-stream` with `X-Content-Type-Options: nosniff` and `Cache-Control: private`, so
+browsers block them as cross-origin images (Chrome: `ERR_BLOCKED_BY_ORB`). The API exposes
+`GET /public/img?path=/immagini-beni/...&v=<versionId>`, which streams the photo with the right
+`image/*` type and a 7-day browser cache. Only `/immagini-beni/<n>/<n>/<file>.<jpg|png|webp|gif>`
+is accepted (never documents) and nothing is stored server-side.
+
+Attachment types: the delegato's description is more reliable than the PVP code (an
+"Avviso di vendita" is often uploaded as `ORDIN`/`PROVV`), so `classify_attachment` checks keywords
+first.
+
 ## 5. Reference lists
 
 | endpoint | content |
@@ -186,7 +202,15 @@ Upcoming real-estate sales (sale date ≥ today):
 So: national list sync ≈ 36 search requests; Veneto details ≈ 500 requests the first night and a
 few dozen afterwards; round history ≈ one search per procedure, refreshed every 30 days.
 
-## 7. Fixtures
+## 7. First live run (22/10/2026)
+
+`python -m ingest sync --scope italy` from an empty database: 20 minutes, 968 PVP requests,
+0 errors. 18,192 list rows, 17,568 lots, 498 Veneto details, 381 procedures of round history
+(1,197 rows), 301 new rounds linked to existing lots, 7 provisional lots merged after their
+detail, 487 provisional keys confirmed, 12 rows skipped for impossible sale dates.
+39 % of national lots have no PVP coordinates (Veneto: 30 %).
+
+## 8. Fixtures
 
 `backend/tests/fixtures/pvp/` holds real responses recorded on 22/10/2026, anonymised: every
 `soggetti` entry has placeholder names/phones/emails and every tax code is replaced with the
