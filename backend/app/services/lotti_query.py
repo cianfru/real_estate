@@ -3,14 +3,15 @@
 from __future__ import annotations
 
 import json
+import math
 from datetime import UTC, datetime, timedelta
 from typing import Any
+from urllib.parse import urlencode
 
 from geoalchemy2 import Geometry
 from sqlalchemy import ColumnElement, Select, and_, case, cast, func, or_, select
 from sqlalchemy.orm import Session
 
-from app.config import get_settings
 from app.labels import tipologia_label
 from app.models import Lotto, Tribunale
 from app.schemas import LottoFilters, LottoListItem, SortKey, TribunaleBrief
@@ -105,13 +106,19 @@ def base_select() -> Select[Any]:
     )
 
 
+def photo_url(stored_path: str) -> str:
+    """Relative URL of the photo passthrough (see routers/images.py); the frontend prefixes /api."""
+    path, _, query = stored_path.partition("?")
+    version = query.split("versionId=", 1)[1].split("&")[0] if "versionId=" in query else None
+    return "/public/img?" + urlencode({"path": path, **({"v": version} if version else {})})
+
+
 def cover_url(lot: Lotto) -> str | None:
     if not lot.cover_image_path:
         return None
-    p = lot.cover_image_path
-    if p.startswith("http"):
-        return p
-    return get_settings().pvp_buckets_host + (p if p.startswith("/") else "/" + p)
+    if lot.cover_image_path.startswith("http"):
+        return lot.cover_image_path
+    return photo_url(lot.cover_image_path)
 
 
 def titolo(lot: Lotto) -> str:
@@ -179,13 +186,25 @@ def geojson(db: Session, f: LottoFilters, limit: int = 20000) -> dict[str, Any]:
         f,
     ).limit(limit)
     features = []
+    seen: dict[tuple[float, float], int] = {}
     for r in db.execute(q):
         approx = r.geocode_source == "comune" or (r.geocode_confidence or 0) < 0.5
+        lon, lat = float(r[2]), float(r[1])
+        # Lots of the same building share coordinates: fan duplicates out on a ~25 m ring so
+        # each marker stays clickable when zoomed in (the true position is on the card).
+        key = (round(lon, 5), round(lat, 5))
+        n = seen.get(key, 0)
+        seen[key] = n + 1
+        if n:
+            angle = n * 2.399963  # golden angle
+            radius = 0.00022 * math.sqrt(n)
+            lon += radius * math.cos(angle) / max(math.cos(math.radians(lat)), 0.1)
+            lat += radius * math.sin(angle)
         features.append(
             {
                 "type": "Feature",
                 "id": r.id,
-                "geometry": {"type": "Point", "coordinates": [round(r[2], 6), round(r[1], 6)]},
+                "geometry": {"type": "Point", "coordinates": [round(lon, 6), round(lat, 6)]},
                 "properties": {
                     "id": r.id,
                     "c": r.category or "ALTRA_CATEGORIA",

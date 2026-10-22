@@ -1,0 +1,37 @@
+# Alternative to the Railway cron service: runs the nightly job on GitHub Actions (free for
+# private repos within the monthly minutes). Enable ONE of the two, not both.
+# Secrets needed: DATABASE_URL, JWT_SECRET, PUBLIC_APP_URL, RESEND_API_KEY (optional),
+# NOMINATIM_EMAIL (optional).
+name: Nightly PVP sync
+
+on:
+  schedule:
+    - cron: "17 1 * * *" # ≈ 03:17 Europe/Rome in summer, 02:17 in winter
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: "veneto or italy"
+        default: italy
+
+jobs:
+  sync:
+    if: vars.NIGHTLY_ON_GITHUB == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      PUBLIC_APP_URL: ${{ secrets.PUBLIC_APP_URL }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      NOMINATIM_EMAIL: ${{ secrets.NOMINATIM_EMAIL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install .
+      - run: alembic upgrade head
+      - run: python -m ingest nightly --scope ${{ github.event.inputs.scope || 'italy' }}

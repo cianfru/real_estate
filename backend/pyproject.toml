@@ -32,6 +32,7 @@ include = ["app*", "ingest*"]
 testpaths = ["tests"]
 
 [tool.ruff]
+extend-exclude = ["alembic"]
 line-length = 120
 target-version = "py312"
 

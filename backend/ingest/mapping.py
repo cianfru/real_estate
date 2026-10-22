@@ -229,6 +229,12 @@ class ListRow:
     raw: dict[str, Any] = field(repr=False)
 
 
+# Sales without a court (e.g. Agenzia Entrate-Riscossione "esecuzioni esattoriali") have no
+# codiceTribunale/codUfficio: they are grouped under this pseudo-tribunale.
+NO_COURT_CODE = "ESATTORIALE"
+NO_COURT_NAME = "Vendite esattoriali (senza tribunale)"
+
+
 def valid_coords(lat: Any, lon: Any) -> tuple[float, float] | None:
     try:
         la, lo = float(lat), float(lon)
@@ -253,8 +259,8 @@ def parse_list_item(item: dict[str, Any]) -> ListRow:
     clean = scrub(item)
     return ListRow(
         pvp_id=int(item["id"]),
-        trib_code=str(item.get("codiceTribunale") or ""),
-        trib_name=item.get("tribunale"),
+        trib_code=str(item.get("codiceTribunale") or NO_COURT_CODE),
+        trib_name=item.get("tribunale") or (NO_COURT_NAME if not item.get("codiceTribunale") else None),
         rge_numero=norm_rge(item.get("procedura")),
         lotto_codice=norm_lotto_code(item.get("numeroLotto")),
         tipo_lotto=item.get("tipoLotto"),
@@ -293,20 +299,21 @@ ATTACHMENT_TYPES = {
 
 
 def classify_attachment(code: str | None, desc: str | None, filename: str | None, path: str | None) -> str:
+    """The description typed by the delegato is more reliable than PVP's type code (an
+    'Avviso di vendita' is often uploaded as ORDIN/PROVV), so keywords win."""
     text = f"{desc or ''} {filename or ''}".lower()
     if "planimetr" in text:
         return "planimetria"
-    if code in ATTACHMENT_TYPES:
-        return ATTACHMENT_TYPES[code]
-    if (path or "").startswith("/immagini-beni/") or "foto" in text or "fotograf" in text:
-        return "foto"
     if "perizia" in text or "stima" in text:
         return "perizia"
     if "avviso" in text:
         return "avviso"
-    if "ordinanza" in text:
+    if "ordinanza" in text or "provvedimento" in text:
         return "ordinanza"
-    return "other"
+    is_image = (path or "").split("?")[0].lower().endswith((".jpg", ".jpeg", ".png", ".webp", ".gif"))
+    if ((path or "").startswith("/immagini-beni/") and is_image) or "foto" in text:
+        return "foto"
+    return ATTACHMENT_TYPES.get(code or "", "other")
 
 
 @dataclass
@@ -449,8 +456,8 @@ def parse_detail(d: dict[str, Any]) -> DetailRow:
     return DetailRow(
         pvp_id=int(d["idVendita"]),
         pvp_lotto_id=lotto.get("idLotto"),
-        trib_code=proc.get("codUfficio"),
-        trib_name=proc.get("descUfficio"),
+        trib_code=proc.get("codUfficio") or NO_COURT_CODE,
+        trib_name=proc.get("descUfficio") or (NO_COURT_NAME if not proc.get("codUfficio") else None),
         rge_numero=norm_rge(proc.get("numeRg")),
         rge_anno=int(anno) if anno else None,
         tipo_procedura=proc.get("descTipoRito"),

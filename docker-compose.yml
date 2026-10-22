@@ -1,0 +1,30 @@
+# Local stack: Postgres 16 + PostGIS and the API.
+#   docker compose up -d
+#   docker compose exec api python -m ingest create-user you@studio.it "Nome" --admin
+#   docker compose exec api python -m ingest sync --scope veneto
+#   cd frontend && npm install && npm run dev        -> http://localhost:5173
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: aste
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build: ./backend
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/aste
+      JWT_SECRET: dev-only-secret-change-me-in-production-please
+      PUBLIC_APP_URL: http://localhost:5173
+    ports: ["8000:8000"]
+
+volumes:
+  pgdata:

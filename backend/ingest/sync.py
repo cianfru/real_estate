@@ -73,6 +73,8 @@ def _point(lat: float | None, lon: float | None) -> str | None:
 
 
 def _short_name(name: str) -> str:
+    if name.startswith("Vendite esattoriali"):
+        return "Esattoriali"
     n = name.replace("Tribunale di ", "").strip()
     return n.title() if n.isupper() else n
 
@@ -92,6 +94,9 @@ class Syncer:
         self.counts: Counter[str] = Counter()
         self.errors: list[str] = []
         self._trib_cache: dict[str, Tribunale] = {}
+        # On the very first sync every lot is "new" to us but not to the market: stay silent so
+        # the first alert digest is not 17,000 items long.
+        self.bootstrap = False
 
     # ------------------------------------------------------------------ helpers
 
@@ -221,7 +226,7 @@ class Syncer:
                     rge_numero=row.rge_numero,
                     rge_anno=anno,
                     lotto_codice=row.lotto_codice,
-                    first_seen=now,
+                    first_seen=self._first_seen(row, now),
                     last_seen=now,
                     status="active",
                 )
@@ -235,7 +240,7 @@ class Syncer:
             self.db.flush()
             self.counts["vendite_created"] += 1
             is_future = v.data_vendita is not None and v.data_vendita >= _start_of_today()
-            if not quiet and is_future:
+            if not quiet and is_future and not self.bootstrap:
                 if created_lot:
                     self.event(lot, "new_lot", v, new={"prezzo_base": v.prezzo_base, "data_vendita": v.data_vendita})
                 else:
@@ -276,6 +281,15 @@ class Syncer:
         lot.missed_runs = 0
         self.refresh_lotto_summary(lot)
         return v
+
+    @staticmethod
+    def _first_seen(row: ListRow, now: datetime) -> datetime:
+        """When the lot appeared on PVP: its publication date if known, so 'new in the last N days'
+        is meaningful from the first sync on."""
+        if row.data_pubblicazione:
+            published = datetime.combine(row.data_pubblicazione, datetime.min.time(), tzinfo=ROME)
+            return min(published, now)
+        return now
 
     def _latest_vendita(self, lot: Lotto) -> Vendita | None:
         return self.db.scalar(
@@ -505,7 +519,7 @@ class Syncer:
             (
                 a.path
                 for a in d.allegati
-                if a.tipo == "foto" and a.path.lower().endswith((".jpg", ".jpeg", ".png", ".webp"))
+                if a.tipo == "foto" and a.path.split("?")[0].lower().endswith((".jpg", ".jpeg", ".png", ".webp"))
             ),
             None,
         )
@@ -639,7 +653,9 @@ class Syncer:
                     row = parse_list_item(item)
                     if row.trib_code != trib.pvp_code or row.rge_numero != num:
                         continue
-                    self.upsert_from_list(row, anno=anno, quiet=True)
+                    # past rounds are history; an upcoming one we had not seen is real news
+                    past = row.data_vendita is not None and row.data_vendita < _start_of_today()
+                    self.upsert_from_list(row, anno=anno, quiet=past)
                     self.counts["history_rows"] += 1
                 now = now_utc()
                 for lot in plots:
@@ -680,6 +696,9 @@ class Syncer:
     # ------------------------------------------------------------------ orchestration
 
     def full_sync(self, scope: str, with_details: bool = True) -> SyncResult:
+        self.bootstrap = self.db.scalar(select(Lotto.id).limit(1)) is None
+        if self.bootstrap:
+            self.counts["bootstrap"] = 1
         self.sync_tribunali()
         seen = self.list_sync(scope)
         if scope == "italy":

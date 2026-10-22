@@ -98,7 +98,7 @@ def test_detail_card(api: TestClient, db: Any) -> None:
     assert d["allegati"] and d["allegati"][0]["url"].startswith("https://resource-pvp.giustizia.it/")
     assert d["pvp_url"].endswith("4648963")
     assert d["contatti"] == []  # flag off
-    assert any(e["tipo"] == "new_lot" for e in d["eventi"])
+    assert d["eventi"] == []  # bootstrap sync is silent
 
 
 @pytest.mark.usefixtures("synced")
@@ -138,7 +138,7 @@ def test_public_rate_limit(monkeypatch: pytest.MonkeyPatch) -> None:
 
 @pytest.mark.usefixtures("only_padova")
 def test_saved_search_alerts_are_sent_once(
-    api: TestClient, db: Any, client: Any, monkeypatch: pytest.MonkeyPatch
+    api: TestClient, db: Any, client: Any, fake_pvp: Any, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     sent: list[tuple[str, str]] = []
     import app.services.alerts as alerts
@@ -153,6 +153,11 @@ def test_saved_search_alerts_are_sent_once(
 
     from app.models import IngestRun
 
+    # bootstrap without the Anguillara lots, then they appear on PVP
+    anguillara = {4649048, 4649059, 4648963}
+    fake_pvp.hidden |= anguillara
+    Syncer(db, client).full_sync("veneto")
+    fake_pvp.hidden -= anguillara
     run = IngestRun(kind="sync", scope="veneto", status="ok")
     db.add(run)
     db.commit()
@@ -179,3 +184,16 @@ def test_admin_endpoints(api: TestClient) -> None:
     meta = api.get("/meta").json()
     assert meta["tribunali"][0]["active_for_enrichment"]
     assert "IMMOBILE_RESIDENZIALE" in meta["categorie"]
+
+
+def test_image_passthrough_only_allows_listing_photos() -> None:
+    anon = TestClient(app)
+    assert anon.get("/public/img", params={"path": "/allegati/1/perizia.pdf"}).status_code == 400
+    assert anon.get("/public/img", params={"path": "/immagini-beni/1/2/../../allegati/x.jpg"}).status_code == 400
+    assert anon.get("/public/img", params={"path": "/immagini-beni/1/2/doc.pdf"}).status_code == 400
+
+
+@pytest.mark.usefixtures("synced")
+def test_cover_url_points_to_passthrough(api: TestClient, db: Any) -> None:
+    d = api.get(f"/lotti/{lot_id(db, 4648963)}").json()
+    assert d["cover_url"].startswith("/public/img?path=%2Fimmagini-beni%2F")

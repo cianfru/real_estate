@@ -7,7 +7,7 @@ from sqlalchemy import text
 
 from app.config import get_settings
 from app.db import engine
-from app.routers import admin, auth, clienti, lotti, meta, public, saved_searches
+from app.routers import admin, auth, clienti, images, lotti, meta, public, saved_searches
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
@@ -39,7 +39,16 @@ async def csrf_guard(request: Request, call_next):  # type: ignore[no-untyped-de
     return await call_next(request)
 
 
-for r in (auth.router, lotti.router, meta.router, saved_searches.router, clienti.router, public.router, admin.router):
+for r in (
+    auth.router,
+    lotti.router,
+    meta.router,
+    saved_searches.router,
+    clienti.router,
+    public.router,
+    images.router,
+    admin.router,
+):
     app.include_router(r)
 
 

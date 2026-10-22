@@ -123,6 +123,9 @@ def _pvp_url(pvp_id: int) -> str:
 
 def _allegato_out(a: Allegato) -> AllegatoOut:
     s = get_settings()
+    image_url = None
+    if a.path.startswith("/immagini-beni/") and a.path.split("?")[0].lower().endswith(IMAGE_EXT):
+        image_url = lq.photo_url(a.path)
     return AllegatoOut(
         id=a.id,
         tipo=a.tipo,
@@ -130,7 +133,11 @@ def _allegato_out(a: Allegato) -> AllegatoOut:
         filename=a.filename,
         url=s.pvp_buckets_host + a.path,
         size=a.size,
+        image_url=image_url,
     )
+
+
+IMAGE_EXT = (".jpg", ".jpeg", ".png", ".webp")
 
 
 def _rounds(lot: Lotto) -> list[VenditaOut]:

@@ -47,7 +47,6 @@ def stats(db: Session = Depends(get_db)) -> dict[str, Any]:
                 .where(active)
                 .group_by(Tribunale.id)
                 .order_by(func.count(Lotto.id).desc())
-                .limit(30)
             )
         ],
     }

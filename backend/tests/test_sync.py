@@ -8,6 +8,7 @@ from sqlalchemy import func, select
 from app.config import get_settings
 from app.models import Allegato, ContattoProfessionale, Evento, Lotto, Vendita
 from ingest.geocode import GeoResult, geocode_missing
+from ingest.mapping import ROME
 from ingest.sync import Syncer
 from tests.conftest import FakePvp
 
@@ -48,13 +49,26 @@ def test_full_sync_builds_lots_rounds_and_history(db: Any, client: Any) -> None:
     assert lot.vendite[0].esito == "ASDES"
     assert lot.current_vendita_id == lot.vendite[1].id
     assert lot.geom is not None and lot.geocode_source == "pvp"
+    assert lot.cover_image_path and lot.cover_image_path.startswith("/immagini-beni/")
 
     # attachments stored as metadata + PVP path only
     allegati = db.scalars(select(Allegato).where(Allegato.vendita_id == lot.current_vendita_id)).all()
     assert allegati and all(a.path.startswith("/") for a in allegati)
 
-    # new lots announced, past history rounds silent
-    assert len(events(db, "new_lot")) == 9
+    # first sync ever: silent bootstrap, first_seen taken from the PVP publication date
+    assert res.counts["bootstrap"] == 1
+    assert not events(db)
+    assert lot.first_seen.astimezone(ROME).date().isoformat() == "2026-10-21"
+
+
+@pytest.mark.usefixtures("only_padova")
+def test_new_lot_after_bootstrap_is_announced(db: Any, client: Any, fake_pvp: FakePvp) -> None:
+    fake_pvp.hidden.add(4649210)
+    Syncer(db, client).full_sync("veneto")
+    fake_pvp.hidden.clear()
+    Syncer(db, client).full_sync("veneto")
+    new = events(db, "new_lot")
+    assert [e.lotto_id for e in new] == [lot_by_pvp(db, 4649210).id]
     assert not events(db, "new_round")
 
 

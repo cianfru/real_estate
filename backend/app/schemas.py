@@ -6,7 +6,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 SortKey = Literal["data_vendita", "termine", "prezzo_asc", "prezzo_desc", "ribasso", "nuovi", "superficie"]
 
@@ -117,6 +117,7 @@ class AllegatoOut(BaseModel):
     filename: str | None
     url: str
     size: int | None
+    image_url: str | None = None  # photo passthrough (relative to the API) when it is a listing photo
 
 
 class VenditaOut(BaseModel):
@@ -254,6 +255,9 @@ class PublicLotto(BaseModel):
     offerta_minima: float | None
     rialzo_minimo: float | None
     valore_stima: float | None
+    sconto_stima_pct: float | None
+    ribasso_pct: float | None
+    prezzo_primo_esperimento: float | None
     prezzo_mq: float | None
     data_vendita: datetime | None
     termine_offerte: datetime | None
@@ -292,7 +296,7 @@ class ClienteOut(BaseModel):
 
 
 class LoginIn(BaseModel):
-    email: EmailStr
+    email: str = Field(min_length=3, max_length=200)
     password: str
 
 
