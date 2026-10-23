@@ -62,6 +62,7 @@ def meta(db: Session = Depends(get_db)) -> dict[str, Any]:
         "cliente_status": labels.CLIENTE_STATUS,
         "store_professional_contacts": get_settings().store_professional_contacts,
         "last_sync_at": last_sync.finished_at if last_sync else None,
+        "sync_running": db.scalar(select(IngestRun.id).where(IngestRun.status == "running").limit(1)) is not None,
         "totals": {
             "active": sum(counts.values()),
         },

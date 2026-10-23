@@ -17,6 +17,7 @@ os.environ["DATABASE_URL"] = os.environ.get(
 os.environ["JWT_SECRET"] = "test-secret-that-is-long-enough-for-hs256"
 os.environ["RESEND_API_KEY"] = ""
 os.environ["PVP_MIN_INTERVAL_S"] = "0"
+os.environ["FIRST_LOAD_ON_START"] = "false"  # never reach PVP from a test
 
 import httpx  # noqa: E402
 import pytest  # noqa: E402

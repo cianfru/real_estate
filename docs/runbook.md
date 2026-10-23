@@ -62,12 +62,13 @@ variable `NIGHTLY_ON_GITHUB=true`), with the Railway cron service removed.
    their own password (emailed when Resend is configured, otherwise copy it from the page and send
    it yourself). No terminal needed. (Emergency door: `railway ssh --service web`, then
    `python -m ingest create-user <email> "<name>" --admin`.)
-5. **First sync.** Log in → Admin → "Avvia sincronizzazione" (Italia). ~20 minutes, ≈ 1,000 PVP
-   requests. The first sync is a silent *bootstrap*: no events, no alert emails.
-6. **Market history**, once: Admin → *Storico di mercato* → "Carica lo storico". ≈ 500 PVP
-   requests, about 10 minutes, then ≈ 30 s of analysis; progress in *Esecuzioni*. Until this has
-   run the Mercato page and the zone layer are empty. The first analysis with data is silent (no
-   opportunity events).
+5. **First load: automatic.** On its first start with an empty database the web service loads
+   PVP by itself: national sync (~20 minutes, ≈ 1,000 requests), geocoding, market history (~10
+   minutes, ≈ 500 requests), analysis. The map says "Primo caricamento in corso" and fills as it
+   goes; progress is in Admin → *Esecuzioni*. Everything in it is a silent *bootstrap*: no events,
+   no alert emails. (`FIRST_LOAD_ON_START=false` turns this off.)
+6. **If a deploy interrupted it** (a restart kills the job; the next start marks it "interrotta"):
+   Admin → Italia → "Avvia la sincronizzazione", then *Storico di mercato* → "Carica lo storico".
 7. **Resend (optional).** Verify the sending domain (`legalestateitalia.it`) in Resend, then set
    `RESEND_API_KEY` and `EMAIL_FROM` on `web` (the cron references them). Without a key, alerts
    are written to the log.

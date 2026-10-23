@@ -245,6 +245,7 @@ export interface Meta {
   cliente_status: Record<string, string>;
   store_professional_contacts: boolean;
   last_sync_at: string | null;
+  sync_running: boolean;
   totals: { active: number };
 }
 

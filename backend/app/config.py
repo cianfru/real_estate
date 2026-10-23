@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     # Built React app (frontend/dist) served by app.server at /. Set in the Docker image.
     frontend_dir: str = ""
 
+    # A brand-new deployment loads PVP by itself at startup: national sync, then the market history.
+    first_load_on_start: bool = True
+
     # First admin, created at startup only while there are no users at all (no terminal needed).
     # Remove ADMIN_PASSWORD once you have logged in; everyone else is invited from the Admin page.
     admin_email: str = ""

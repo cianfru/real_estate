@@ -1,10 +1,49 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { SearchX } from "lucide-react";
+import { DatabaseZap, SearchX } from "lucide-react";
 import { useEffect, useRef } from "react";
-import type { LottoListItem } from "@/lib/types";
-import { useNow } from "@/lib/hooks";
+import { Link } from "react-router-dom";
+import { api } from "@/lib/api";
+import type { LottoListItem, Meta } from "@/lib/types";
+import { useMe, useNow } from "@/lib/hooks";
 import { LottoRow } from "./LottoRow";
 import { Empty, Spinner } from "./ui";
+
+/** Nothing in the database yet: say why, and refresh by itself while the first load runs. */
+function FirstLoad() {
+  const qc = useQueryClient();
+  const { data: me } = useMe();
+  const meta = useQuery({
+    queryKey: ["meta"],
+    queryFn: () => api<Meta>("/meta"),
+    refetchInterval: (q) => (q.state.data?.totals.active === 0 ? 15_000 : false),
+  });
+  const active = meta.data?.totals.active ?? 0;
+  useEffect(() => {
+    if (active > 0) void qc.invalidateQueries({ predicate: (q) => q.queryKey[0] !== "meta" && q.queryKey[0] !== "me" });
+  }, [active, qc]);
+  if (meta.data?.sync_running)
+    return (
+      <Empty icon={<Spinner />} title="Primo caricamento in corso">
+        Stiamo leggendo dal Portale delle Vendite Pubbliche le aste di tutta Italia (circa 20 minuti). La mappa si riempie da sola: non serve ricaricare.
+      </Empty>
+    );
+  return (
+    <Empty icon={<DatabaseZap className="size-5" />} title="Ancora nessun immobile">
+      {me?.is_admin ? (
+        <>
+          Avvia il primo caricamento dalla pagina{" "}
+          <Link to="/admin" className="font-medium text-ink underline-offset-4 hover:underline">
+            Admin
+          </Link>
+          : scegli «Italia» e «Avvia la sincronizzazione».
+        </>
+      ) : (
+        "Il database è vuoto: chiedi all'amministratore di avviare la prima sincronizzazione."
+      )}
+    </Empty>
+  );
+}
 
 export function ResultList({
   items,
@@ -49,6 +88,8 @@ export function ResultList({
     if (i >= 0 && !parent.current?.matches(":hover")) v.scrollToIndex(i, { align: "auto" });
   }, [hoveredId, items, v]);
 
+  const meta = useQuery({ queryKey: ["meta"], queryFn: () => api<Meta>("/meta"), staleTime: 10 * 60_000 });
+  if (!loading && items.length === 0 && meta.data?.totals.active === 0) return <FirstLoad />;
   if (!loading && items.length === 0) {
     return (
       <Empty icon={<SearchX className="size-5" />} title="Nessun immobile trovato">

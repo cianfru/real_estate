@@ -66,3 +66,29 @@ def test_first_admin_from_environment(tmp_path: Path, db: Any, monkeypatch: pyte
     with TestClient(create_site(tmp_path)):
         pass  # users exist: the variables are ignored
     assert [u.email for u in db.query(User).all()] == ["avv@example.org"]
+
+
+def test_restart_closes_interrupted_runs_and_first_load_starts_once(
+    tmp_path: Path, db: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import app.server as server
+    from app.config import get_settings
+    from app.models import IngestRun
+
+    started: list[int] = []
+    monkeypatch.setattr(server, "start_first_load", lambda: started.append(1))
+    monkeypatch.setattr(get_settings(), "first_load_on_start", True)
+    db.add(IngestRun(kind="geocode", status="running"))
+    db.commit()
+    with TestClient(create_site(tmp_path)):
+        pass
+    db.expire_all()
+    run = db.query(IngestRun).one()
+    assert run.status == "failed" and "riavvio" in run.errors[-1]
+    assert started == [1]  # never synced: the first load starts
+
+    db.add(IngestRun(kind="sync", status="failed"))
+    db.commit()
+    with TestClient(create_site(tmp_path)):
+        pass
+    assert started == [1]  # a sync was attempted once: from now on it's the admin's call
