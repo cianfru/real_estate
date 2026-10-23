@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Page } from "@/components/AppShell";
+import { ClientAccounts } from "@/components/ClientAccounts";
 import { Button, Card, Empty, Field, Input, Spinner, Textarea, cx } from "@/components/ui";
 import { api, del, post, put } from "@/lib/api";
 import { date, eur } from "@/lib/format";
@@ -36,7 +37,7 @@ export default function Clienti() {
   return (
     <Page
       title="Clienti"
-      subtitle="Solo un nome interno e note libere. Nessun dato fiscale."
+      subtitle="Un nome interno, note libere e, se vuoi, l'accesso del cliente alla sua area riservata. Nessun dato fiscale."
       actions={
         <Button variant="gold" onClick={() => setEditing("new")}>
           Nuovo cliente
@@ -87,6 +88,7 @@ export default function Clienti() {
                   </div>
                 </div>
                 {current.notes && <p className="mt-5 max-w-[65ch] whitespace-pre-line font-serif text-[16px] leading-relaxed text-ink/85">{current.notes}</p>}
+                <ClientAccounts cliente={current} />
                 <h3 className="mt-12 mb-3 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-faint">Immobili collegati</h3>
                 {current.lotti.length === 0 ? (
                   <p className="text-[13.5px] text-muted">Nessun immobile. Collegali dalla scheda dell'immobile.</p>
@@ -98,6 +100,8 @@ export default function Clienti() {
                           <p className="truncate font-serif text-[16px] text-ink group-hover:text-gold">{l.titolo}</p>
                           <p className="text-[12.5px] text-muted">
                             {l.tribunale} · vendita {date(l.data_vendita)} · {label(meta?.status, l.lotto_status)}
+                            {!l.nel_portale && <span className="ml-2 text-faint">· nascosto al cliente</span>}
+                            {l.nel_portale && l.nota_cliente && <span className="ml-2 text-faint">· con nota per il cliente</span>}
                           </p>
                         </div>
                         <p className="num text-[14px] font-semibold text-ink">{eur(l.prezzo_base)}</p>

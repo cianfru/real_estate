@@ -123,6 +123,10 @@ export interface ClienteLink {
   cliente_name: string;
   status: string;
   updated_at: string;
+  nel_portale: boolean;
+  nota_cliente: string | null;
+  /** the client has an active login to their area */
+  portal_access: boolean;
 }
 
 export interface Contatto {
@@ -254,6 +258,9 @@ export interface User {
   email: string;
   name: string;
   is_admin: boolean;
+  /** "client": a login to the client area (/portale), nothing else of the app */
+  role: "staff" | "client";
+  cliente_name: string | null;
 }
 
 export interface AdminUser extends User {
@@ -298,6 +305,8 @@ export interface ClienteLotto {
   prezzo_base: number | null;
   data_vendita: string | null;
   lotto_status: string;
+  nel_portale: boolean;
+  nota_cliente: string | null;
 }
 
 export interface Cliente {
@@ -306,6 +315,25 @@ export interface Cliente {
   notes: string | null;
   created_at: string;
   lotti: ClienteLotto[];
+  accounts: AdminUser[];
+}
+
+/** A property in the client area. */
+export interface PortalItem {
+  lotto_id: number;
+  titolo: string;
+  comune: string | null;
+  provincia: string | null;
+  tribunale: string;
+  prezzo_base: number | null;
+  superficie_mq: number | null;
+  data_vendita: string | null;
+  termine_offerte: string | null;
+  lotto_status: string;
+  cover_url: string | null;
+  stato: string;
+  nota_cliente: string | null;
+  aggiornato: string;
 }
 
 export interface IngestRun {
@@ -390,4 +418,10 @@ export interface MarketOverview {
     cover_url: string | null;
     n_rounds: number;
   }[];
+}
+
+export interface PortalLotto extends PublicLotto {
+  stato: string;
+  nota_cliente: string | null;
+  aggiornato: string;
 }

@@ -269,16 +269,7 @@ def build_detail(db: Session, lot: Lotto) -> LottoDetail:
             )
             for n in note
         ],
-        clienti=[
-            ClienteLinkOut(
-                id=link.id,
-                cliente_id=link.cliente_id,
-                cliente_name=link.cliente.display_name,
-                status=link.status,
-                updated_at=link.updated_at,
-            )
-            for link in links
-        ],
+        clienti=[link_out(link) for link in links],
         contatti=contatti,
         share_links=[
             ShareLinkOut(
@@ -406,6 +397,19 @@ def delete_note(lotto_id: int, nota_id: int, db: Session = Depends(get_db), user
 # ------------------------------------------------------------------ clients
 
 
+def link_out(link: LottoCliente) -> ClienteLinkOut:
+    return ClienteLinkOut(
+        id=link.id,
+        cliente_id=link.cliente_id,
+        cliente_name=link.cliente.display_name,
+        status=link.status,
+        updated_at=link.updated_at,
+        nel_portale=link.nel_portale,
+        nota_cliente=link.nota_cliente,
+        portal_access=any(a.is_active for a in link.cliente.accounts),
+    )
+
+
 @router.post("/{lotto_id}/clienti", response_model=ClienteLinkOut)
 def link_cliente(lotto_id: int, body: LottoClienteIn, db: Session = Depends(get_db)) -> ClienteLinkOut:
     lot = load_lotto(db, lotto_id)
@@ -420,13 +424,7 @@ def link_cliente(lotto_id: int, body: LottoClienteIn, db: Session = Depends(get_
         link.status = body.status
     db.commit()
     db.refresh(link)
-    return ClienteLinkOut(
-        id=link.id,
-        cliente_id=cliente.id,
-        cliente_name=cliente.display_name,
-        status=link.status,
-        updated_at=link.updated_at,
-    )
+    return link_out(link)
 
 
 @router.patch("/{lotto_id}/clienti/{link_id}", response_model=ClienteLinkOut)
@@ -434,16 +432,15 @@ def update_link(lotto_id: int, link_id: int, body: LottoClienteUpdate, db: Sessi
     link = db.get(LottoCliente, link_id)
     if link is None or link.lotto_id != lotto_id:
         raise HTTPException(404, "Collegamento non trovato")
-    link.status = body.status
+    if body.status is not None:
+        link.status = body.status
+    if body.nel_portale is not None:
+        link.nel_portale = body.nel_portale
+    if "nota_cliente" in body.model_fields_set:
+        link.nota_cliente = (body.nota_cliente or "").strip() or None
     db.commit()
     db.refresh(link)
-    return ClienteLinkOut(
-        id=link.id,
-        cliente_id=link.cliente_id,
-        cliente_name=link.cliente.display_name,
-        status=link.status,
-        updated_at=link.updated_at,
-    )
+    return link_out(link)
 
 
 @router.delete("/{lotto_id}/clienti/{link_id}", status_code=204)

@@ -31,6 +31,7 @@
 | D25 | Hosting: Railway Hobby (web + nightly cron from one image) and Neon free for Postgres/PostGIS; no Vercel | Vercel's Hobby plan is "restricted to non-commercial personal use only" (Fair Use Guidelines) and Pro is paid per member; the firm already has Railway Hobby |
 | D26 | Staff accounts are managed from the Admin page by invitation: the person gets a one-time link (hashed in the database, 7 days) and chooses their own password; resets work the same way; deactivation and password changes end open sessions at once | nobody knows anyone else's password, no terminal after setup, works without email (the admin copies the link) |
 | D27 | A fresh deployment loads PVP by itself at its first start (sync → geocoding → history → analysis) and the empty map explains what is happening; runs left "running" by a restart are closed at startup | no terminal and no manual step after deploying; a deploy during a job never blocks the Admin buttons |
+| D28 | Client area (`/portale`): clients log in with the same invite-link system and see only the properties linked to them and visible, with the share-page facts, the status and the firm's message. Client logins are `users` rows with `cliente_id`; `current_user` refuses them everywhere else | requested by the firm owner on 23/10/2026, who accepted storing a name and an email per client contact (personal data: the firm should mention it in its privacy notice and GDPR register) |
 
 ## Known limitations
 
@@ -47,6 +48,10 @@
   rest on 2020–2025 appraisals; the 12-month trend stays hidden until then.
 
 ## Pending (need the firm's input)
+
+- **Client area and GDPR**: client logins store a name and an email per person. Add a line to the
+  firm's GDPR register (purpose: sharing selected auctions with the client; legal basis: the
+  mandate; retention: until access is removed) and to the privacy notice given to clients.
 
 - **STORE_PROFESSIONAL_CONTACTS**: enable to show delegato / custode / viewing contact on the card.
   Needs a short note in the firm's GDPR register (legitimate interest, source = public PVP

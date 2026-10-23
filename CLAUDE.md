@@ -23,6 +23,8 @@ and keep them current.
 - Lot identity and events: `ingest/sync.py` (see docs/data-model.md "Lot identity")
 - Property card: `frontend/src/components/LottoCard.tsx` + `LottoParts.tsx`
 - Staff accounts: `app/routers/users.py` (Admin page) + `app/services/accounts.py` (one-time links)
+- Client area: `app/routers/portale.py`, client logins in `routers/clienti.py`; staff routers use
+  `current_user` (refuses client logins), the client area `client_user`
 - Production entry point: `backend/app/server.py` (website at `/`, API at `/api`), root `Dockerfile`,
   `railway.json` (web) and `railway.cron.json` (nightly); see docs/runbook.md
 - Zone values, price index, opportunities: `ingest/analytics.py` (method in docs/market-analysis.md);

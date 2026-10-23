@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.auth import clear_session, current_user, issue_session, verify_password
+from app.auth import clear_session, issue_session, session_user, verify_password
 from app.db import get_db
 from app.models import PasswordToken, User
 from app.schemas import ChangePasswordIn, ForgotPasswordIn, LoginIn, SetPasswordIn, TokenInfoOut, UserOut
@@ -16,7 +16,14 @@ FORGOT_COOLDOWN = timedelta(minutes=5)
 
 
 def _out(u: User) -> UserOut:
-    return UserOut(id=u.id, email=u.email, name=u.name, is_admin=u.is_admin)
+    return UserOut(
+        id=u.id,
+        email=u.email,
+        name=u.name,
+        is_admin=u.is_admin and not u.is_client,
+        role="client" if u.is_client else "staff",
+        cliente_name=u.cliente.display_name if u.cliente else None,
+    )
 
 
 @router.post("/login", response_model=UserOut)
@@ -36,13 +43,13 @@ def logout(response: Response) -> None:
 
 
 @router.get("/me", response_model=UserOut)
-def me(user: User = Depends(current_user)) -> UserOut:
+def me(user: User = Depends(session_user)) -> UserOut:
     return _out(user)
 
 
 @router.post("/password", response_model=UserOut)
 def change_password(
-    body: ChangePasswordIn, response: Response, db: Session = Depends(get_db), user: User = Depends(current_user)
+    body: ChangePasswordIn, response: Response, db: Session = Depends(get_db), user: User = Depends(session_user)
 ) -> UserOut:
     if not verify_password(body.current_password, user.password_hash):
         raise HTTPException(400, "La password attuale non è corretta")

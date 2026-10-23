@@ -292,6 +292,10 @@ function ClientLinks({ lot, meta }: { lot: LottoDetail; meta: Meta | undefined }
     mutationFn: ({ lid, status }: { lid: number; status: string }) => patch(`/lotti/${lot.id}/clienti/${lid}`, { status }),
     onSuccess: inv,
   });
+  const setPortal = useMutation({
+    mutationFn: ({ lid, ...body }: { lid: number; nel_portale?: boolean; nota_cliente?: string }) => patch(`/lotti/${lot.id}/clienti/${lid}`, body),
+    onSuccess: inv,
+  });
   const unlink = useMutation({ mutationFn: (lid: number) => del(`/lotti/${lot.id}/clienti/${lid}`), onSuccess: inv });
 
   return (
@@ -299,18 +303,21 @@ function ClientLinks({ lot, meta }: { lot: LottoDetail; meta: Meta | undefined }
       {lot.clienti.length > 0 && (
         <ul className="divide-y divide-line">
           {lot.clienti.map((c) => (
-            <li key={c.id} className="group flex items-center gap-3 py-2">
-              <Link to={`/clienti?id=${c.cliente_id}`} className="min-w-0 flex-1 truncate text-[14px] text-ink hover:text-gold">
-                {c.cliente_name}
-              </Link>
-              <Select value={c.status} onChange={(e) => setStatus.mutate({ lid: c.id, status: e.target.value })} className="!h-8 !w-auto !border-transparent !text-[12.5px] text-muted">
-                {Object.entries(meta?.cliente_status ?? {}).map(([k, v]) => (
-                  <option key={k} value={k}>
-                    {v}
-                  </option>
-                ))}
-              </Select>
-              <IconButton label="Scollega" className="opacity-0 group-hover:opacity-100" icon={<X className="size-3.5" />} onClick={() => unlink.mutate(c.id)} />
+            <li key={c.id} className="group py-2.5">
+              <div className="flex items-center gap-3">
+                <Link to={`/clienti?id=${c.cliente_id}`} className="min-w-0 flex-1 truncate text-[14px] text-ink hover:text-gold">
+                  {c.cliente_name}
+                </Link>
+                <Select value={c.status} onChange={(e) => setStatus.mutate({ lid: c.id, status: e.target.value })} className="!h-8 !w-auto !border-transparent !text-[12.5px] text-muted">
+                  {Object.entries(meta?.cliente_status ?? {}).map(([k, v]) => (
+                    <option key={k} value={k}>
+                      {v}
+                    </option>
+                  ))}
+                </Select>
+                <IconButton label="Scollega" className="opacity-0 group-hover:opacity-100" icon={<X className="size-3.5" />} onClick={() => unlink.mutate(c.id)} />
+              </div>
+              <ClientPortalControls link={c} onChange={(body) => setPortal.mutate({ lid: c.id, ...body })} />
             </li>
           ))}
         </ul>
@@ -454,6 +461,57 @@ function ShareButton({ lot }: { lot: LottoDetail }) {
           </motion.div>
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+/** What this client sees of the property in their area: visible or not, and the firm's message. */
+function ClientPortalControls({ link, onChange }: { link: ClienteLink; onChange: (body: { nel_portale?: boolean; nota_cliente?: string }) => void }) {
+  const [editing, setEditing] = useState(false);
+  const [text, setText] = useState(link.nota_cliente ?? "");
+  return (
+    <div className="mt-1 text-[12px]">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
+        <button type="button" className="inline-flex cursor-pointer items-center gap-2 text-muted hover:text-ink" onClick={() => onChange({ nel_portale: !link.nel_portale })}>
+          <span className={cx("size-2 rounded-full", link.nel_portale ? "bg-gold" : "bg-line-strong")} />
+          {link.nel_portale ? "Visibile nella sua area" : "Nascosto al cliente"}
+        </button>
+        {!editing && (
+          <button
+            type="button"
+            className="cursor-pointer text-muted hover:text-ink"
+            onClick={() => {
+              setText(link.nota_cliente ?? "");
+              setEditing(true);
+            }}
+          >
+            {link.nota_cliente ? "Modifica la nota per il cliente" : "Scrivi una nota per il cliente"}
+          </button>
+        )}
+        {!link.portal_access && <span className="text-faint">non ha ancora un accesso all'area riservata</span>}
+      </div>
+      {editing ? (
+        <form
+          className="mt-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            onChange({ nota_cliente: text });
+            setEditing(false);
+          }}
+        >
+          <Textarea autoFocus rows={3} maxLength={2000} value={text} onChange={(e) => setText(e.target.value)} placeholder="Es. «Visita fissata giovedì alle 10. Consigliamo un'offerta entro 120.000 €.»" />
+          <div className="mt-2 flex gap-5">
+            <Button type="submit" size="sm" variant="gold">
+              Salva
+            </Button>
+            <Button type="button" size="sm" variant="ghost" onClick={() => setEditing(false)}>
+              Annulla
+            </Button>
+          </div>
+        </form>
+      ) : (
+        link.nota_cliente && <p className="mt-1.5 border-l-2 border-gold/60 pl-3 font-serif text-[13.5px] leading-relaxed whitespace-pre-line text-ink/80">{link.nota_cliente}</p>
+      )}
     </div>
   );
 }

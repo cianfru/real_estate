@@ -13,6 +13,8 @@ const NAV = [
   { to: "/clienti", label: "Clienti" },
   { to: "/admin", label: "Admin" },
 ];
+// a client login only has its own area
+const CLIENT_NAV = [{ to: "/portale", label: "I tuoi immobili", end: false }];
 
 export function TopBar({ floating }: { floating?: boolean }) {
   const { data: me } = useMe();
@@ -26,7 +28,7 @@ export function TopBar({ floating }: { floating?: boolean }) {
         floating ? "glass absolute top-3 right-3 left-3 rounded-xl shadow-soft" : "glass sticky top-0",
       )}
     >
-      <NavLink to="/" className="shrink-0">
+      <NavLink to={me?.role === "client" ? "/portale" : "/"} className="shrink-0">
         <span className="hidden sm:inline">
           <Logo />
         </span>
@@ -35,7 +37,7 @@ export function TopBar({ floating }: { floating?: boolean }) {
         </span>
       </NavLink>
       <nav className="no-scrollbar mx-auto flex min-w-0 items-center gap-5 overflow-x-auto py-1 sm:gap-8">
-        {NAV.map(({ to, label, end }) => (
+        {(me?.role === "client" ? CLIENT_NAV : NAV).map(({ to, label, end }) => (
           <NavLink key={to} to={to} end={end} className="relative">
             {({ isActive }) => (
               <span className={cx("relative block py-1.5 text-[13.5px] whitespace-nowrap transition-colors", isActive ? "font-semibold text-ink" : "text-muted hover:text-ink")}>
@@ -64,18 +66,35 @@ export function TopBar({ floating }: { floating?: boolean }) {
   );
 }
 
-export function Page({ title, subtitle, actions, children, wide }: { title: string; subtitle?: ReactNode; actions?: ReactNode; children: ReactNode; wide?: boolean }) {
+export function Page({
+  title,
+  subtitle,
+  actions,
+  children,
+  wide,
+  bare,
+}: {
+  title?: string;
+  subtitle?: ReactNode;
+  actions?: ReactNode;
+  children: ReactNode;
+  wide?: boolean;
+  /** no page heading: the content brings its own */
+  bare?: boolean;
+}) {
   return (
     <div className="min-h-full">
       <TopBar />
       <main className={cx("mx-auto px-5 py-12 sm:px-10 sm:py-16", wide ? "max-w-7xl" : "max-w-6xl")}>
-        <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
-          <div>
-            <h1 className="font-serif text-[40px] leading-[1.05] tracking-tight text-ink">{title}</h1>
-            {subtitle && <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted">{subtitle}</p>}
+        {!bare && (
+          <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <h1 className="font-serif text-[40px] leading-[1.05] tracking-tight text-ink">{title}</h1>
+              {subtitle && <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted">{subtitle}</p>}
+            </div>
+            {actions}
           </div>
-          {actions}
-        </div>
+        )}
         {children}
       </main>
     </div>

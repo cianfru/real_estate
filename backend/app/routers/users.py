@@ -11,33 +11,29 @@ from app.auth import admin_user
 from app.db import get_db
 from app.models import User
 from app.schemas import AdminUserOut, PasswordLinkOut, UserCreateIn, UserPatchIn
-from app.services.accounts import email_link, new_link
+from app.services.accounts import email_link, invite, new_link
 
 router = APIRouter(prefix="/admin/users", tags=["admin"])
 
 
 def _get(db: Session, uid: int) -> User:
     user = db.get(User, uid)
-    if user is None:
+    if user is None or user.is_client:  # client logins are managed from their client's page
         raise HTTPException(404, "Utente non trovato")
     return user
 
 
 @router.get("", response_model=list[AdminUserOut])
 def list_users(db: Session = Depends(get_db), _: User = Depends(admin_user)) -> list[User]:
-    return list(db.scalars(select(User).order_by(User.is_active.desc(), func.lower(User.name))))
+    staff = select(User).where(User.cliente_id.is_(None))
+    return list(db.scalars(staff.order_by(User.is_active.desc(), func.lower(User.name))))
 
 
 @router.post("", response_model=PasswordLinkOut, status_code=201)
-def invite(body: UserCreateIn, db: Session = Depends(get_db), admin: User = Depends(admin_user)) -> PasswordLinkOut:
-    email = str(body.email).strip().lower()
-    if db.scalar(select(User.id).where(func.lower(User.email) == email)):
-        raise HTTPException(409, "Esiste già un utente con questa email")
-    user = User(email=email, name=body.name.strip(), password_hash="", is_admin=body.is_admin)
-    db.add(user)
-    db.flush()
-    link = new_link(db, user, "invite", created_by=admin)
-    db.commit()
+def invite_staff(
+    body: UserCreateIn, db: Session = Depends(get_db), admin: User = Depends(admin_user)
+) -> PasswordLinkOut:
+    user, link = invite(db, email=str(body.email), name=body.name, created_by=admin, is_admin=body.is_admin)
     return PasswordLinkOut(
         user=AdminUserOut.model_validate(user), link=link, purpose="invite", emailed=email_link(user, link, "invite")
     )

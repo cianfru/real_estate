@@ -181,6 +181,9 @@ class ClienteLinkOut(BaseModel):
     cliente_name: str
     status: str
     updated_at: datetime
+    nel_portale: bool = True
+    nota_cliente: str | None = None
+    portal_access: bool = False  # the client has an active login to their area
 
 
 class LottoClienteIn(BaseModel):
@@ -189,7 +192,9 @@ class LottoClienteIn(BaseModel):
 
 
 class LottoClienteUpdate(BaseModel):
-    status: Literal["in_valutazione", "offerta_presentata", "aggiudicato", "scartato"]
+    status: Literal["in_valutazione", "offerta_presentata", "aggiudicato", "scartato"] | None = None
+    nel_portale: bool | None = None
+    nota_cliente: str | None = Field(None, max_length=2000)
 
 
 class ContattoOut(BaseModel):
@@ -337,6 +342,33 @@ class ClienteOut(BaseModel):
     notes: str | None
     created_at: datetime
     lotti: list[dict[str, Any]]
+    accounts: list[AdminUserOut] = []
+
+
+class ClientAccountIn(BaseModel):
+    email: EmailStr
+    name: str = Field(min_length=1, max_length=200)
+
+
+class ClientAccountPatch(BaseModel):
+    is_active: bool
+
+
+class PortalItem(BaseModel):
+    lotto_id: int
+    titolo: str
+    comune: str | None
+    provincia: str | None
+    tribunale: str
+    prezzo_base: float | None
+    superficie_mq: float | None
+    data_vendita: datetime | None
+    termine_offerte: datetime | None
+    lotto_status: str
+    cover_url: str | None
+    stato: str
+    nota_cliente: str | None
+    aggiornato: datetime
 
 
 class LoginIn(BaseModel):
@@ -349,6 +381,8 @@ class UserOut(BaseModel):
     email: str
     name: str
     is_admin: bool
+    role: Literal["staff", "client"] = "staff"
+    cliente_name: str | None = None
 
 
 class AdminUserOut(BaseModel):
@@ -411,3 +445,11 @@ class IngestRunOut(BaseModel):
     finished_at: datetime | None
     counts: dict[str, Any] | None
     errors: list[str] | None
+
+
+class PortalLotto(PublicLotto):
+    """The client-area card: the share-page facts plus where the firm stands for this client."""
+
+    stato: str
+    nota_cliente: str | None
+    aggiornato: datetime

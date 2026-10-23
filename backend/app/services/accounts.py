@@ -11,6 +11,7 @@ import logging
 import secrets
 from datetime import UTC, datetime, timedelta
 
+from fastapi import HTTPException
 from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session
 
@@ -50,6 +51,21 @@ def new_link(db: Session, user: User, purpose: str, created_by: User | None = No
     return f"{get_settings().public_app_url.rstrip('/')}/accesso/{raw}"
 
 
+def invite(
+    db: Session, *, email: str, name: str, created_by: User, is_admin: bool = False, cliente_id: int | None = None
+) -> tuple[User, str]:
+    """A new account without a password, and the link to choose one."""
+    email = email.strip().lower()
+    if db.scalar(select(User.id).where(func.lower(User.email) == email)):
+        raise HTTPException(409, "Esiste già un utente con questa email")
+    user = User(email=email, name=name.strip(), password_hash="", is_admin=is_admin, cliente_id=cliente_id)
+    db.add(user)
+    db.flush()
+    link = new_link(db, user, "invite", created_by=created_by)
+    db.commit()
+    return user, link
+
+
 def valid_token(db: Session, raw: str) -> PasswordToken | None:
     t = db.scalar(select(PasswordToken).where(PasswordToken.token_hash == _digest(raw)))
     if t is None or t.used_at is not None or t.expires_at <= datetime.now(UTC):
@@ -79,7 +95,13 @@ def email_link(user: User, link: str, purpose: str) -> bool:
         return False
     days = TTL[purpose].days or None
     validity = f"{days} giorni" if days else f"{int(TTL[purpose].total_seconds() // 3600)} ore"
-    if purpose == "invite":
+    if purpose == "invite" and user.is_client:
+        subject = "La tua area riservata Legal Estate"
+        intro = (
+            "lo studio Legal Estate ti ha aperto un'area riservata dove trovi gli immobili all'asta selezionati "
+            "per te e le nostre note. Scegli la tua password da questo link:"
+        )
+    elif purpose == "invite":
         subject = "Il tuo accesso a Legal Estate · Aste"
         intro = "lo studio ti ha creato un accesso a Legal Estate · Aste. Scegli la tua password da questo link:"
     else:

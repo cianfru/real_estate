@@ -10,6 +10,7 @@ of the **Portale delle Vendite Pubbliche** (`pvp.giustizia.it`), at near-zero ru
 - Map + list with filters, polygon search, property card with round timeline and discounts
 - Internal notes, client links, read-only share links for clients
 - Staff accounts managed from the Admin page: invitations by link, password resets, deactivation
+- Client area: each client can get a login and sees only the properties the firm selected for them, with the firm's notes
 - Saved searches with a morning email digest of new lots, new rounds, price drops and new
   opportunities
 - **Market analysis**: appraised €/m² per zone (≈2 km hexagons, comuni, provinces) from ~250,000

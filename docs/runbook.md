@@ -107,6 +107,8 @@ Every step writes a row in `ingest_runs`, visible on the **Admin** page with cou
 | invite a person | Admin → *Persone dello studio* → name, email, "Invita" |
 | forgotten password | the person uses "Password dimenticata?" on the login page (needs Resend), or Admin → "Link per nuova password" |
 | disable / re-enable a person | Admin → "Disattiva" / "Riattiva" (their open sessions stop at once) |
+| give a client access to their area | Clienti → the client → *Area riservata del cliente* → name, email, "Dai accesso al cliente"; they see the properties linked to them |
+| hide a property from a client / write them a note | property card → *Clienti* → "Visibile nella sua area" / "Scrivi una nota per il cliente" |
 
 ## When PVP changes
 
@@ -130,7 +132,9 @@ Symptoms: a run on the Admin page is **failed** with `SchemaDriftError`, or `Pvp
 - Turn on professional contacts: set `STORE_PROFESSIONAL_CONTACTS=true` on both services; they
   are filled at the next detail fetch. Turn off: set it to `false` and run
   `TRUNCATE contatti_professionali;`.
-- Client data is display name + notes only; deleting a client removes its links.
+- Client data is display name + notes; a client with access to their area also has, per person, a
+  name and an email. Deleting a client removes its links and erases its logins; "Elimina" on a
+  single login erases that person.
 
 ## Rotating secrets
 

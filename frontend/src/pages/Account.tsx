@@ -24,7 +24,7 @@ export default function Account() {
   });
 
   return (
-    <Page title="Il tuo account" subtitle={me ? `${me.name} · ${me.email} · ${me.is_admin ? "amministratore" : "collaboratore"}` : undefined}>
+    <Page title="Il tuo account" subtitle={me ? `${me.name} · ${me.email} · ${me.role === "client" ? `area riservata${me.cliente_name ? ` di ${me.cliente_name}` : ""}` : me.is_admin ? "amministratore" : "collaboratore"}` : undefined}>
       <section className="max-w-md">
         <SectionTitle>Cambia password</SectionTitle>
         <form

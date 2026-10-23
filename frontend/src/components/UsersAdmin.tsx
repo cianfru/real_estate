@@ -117,7 +117,7 @@ export function UsersAdmin() {
   );
 }
 
-function IssuedLink({ issued, onClose }: { issued: PasswordLink; onClose: () => void }) {
+export function IssuedLink({ issued, onClose }: { issued: PasswordLink; onClose: () => void }) {
   const [copied, setCopied] = useState(false);
   const who = issued.user.name;
   return (

@@ -126,9 +126,14 @@ Rebuilt by `python -m ingest analytics`; see `docs/market-analysis.md`. No perso
   (GeoJSON), `alert_enabled`.
 - `alert_log`: one row per (user, evento) sent; the unique constraint guarantees an event is never
   emailed twice.
-- `clienti`: internal display name + free notes. **No tax codes, no contact data.**
+- `clienti`: internal display name + free notes. **No tax codes.** Contact data only as the logins
+  below, when the firm gives the client access to their area.
 - `lotto_cliente`: lot ↔ client with status `in_valutazione` / `offerta_presentata` /
-  `aggiudicato` / `scartato`.
+  `aggiudicato` / `scartato`, `nel_portale` (shown in the client's area, default yes) and
+  `nota_cliente` (the firm's message to the client, shown there; never the internal notes).
+- Client logins: rows of `users` with `cliente_id` set (name, email, password hash). They can only
+  call `/auth/*` and `/portale/*`; every other router depends on `current_user`, which refuses
+  them. Deleting a login or the client erases them (`ON DELETE CASCADE`).
 - `note`: free text per lot, with author.
 - `share_links`: random token (192 bit), `expires_at` (default 30 days), `revoked`.
 
@@ -182,4 +187,5 @@ Edge cases:
 - Debtor names: PVP does not publish them in structured fields; free-text descriptions are kept as
   published by the court (the delegato is responsible for anonymisation there).
 - Professional contacts: behind `STORE_PROFESSIONAL_CONTACTS`, own table, judges excluded.
-- Clients: display name + notes only.
+- Clients: display name + notes. A client's area adds, per person given access, a name and an
+  email (and a password hash); "Elimina" on the login, or deleting the client, erases them.

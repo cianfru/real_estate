@@ -7,7 +7,7 @@ from sqlalchemy import text
 
 from app.config import get_settings
 from app.db import engine
-from app.routers import admin, analytics, auth, clienti, images, lotti, meta, public, saved_searches, users
+from app.routers import admin, analytics, auth, clienti, images, lotti, meta, portale, public, saved_searches, users
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
@@ -50,6 +50,7 @@ for r in (
     analytics.router,
     admin.router,
     users.router,
+    portale.router,
 ):
     app.include_router(r)
 

@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.db import get_db
-from app.models import ShareLink
+from app.models import Lotto, ShareLink
 from app.ratelimit import public_rate_limit
 from app.routers.lotti import _rounds, build_detail, current_vendita, documents, load_lotto
 from app.schemas import PublicLotto
@@ -18,7 +18,11 @@ def public_lotto(token: str, db: Session = Depends(get_db)) -> PublicLotto:
     s = db.scalar(select(ShareLink).where(ShareLink.token == token))
     if s is None or s.revoked or (s.expires_at and s.expires_at < datetime.now(UTC)):
         raise HTTPException(404, "Link non valido o scaduto")
-    lot = load_lotto(db, s.lotto_id)
+    return public_view(db, load_lotto(db, s.lotto_id), s.expires_at)
+
+
+def public_view(db: Session, lot: Lotto, expires_at: datetime | None) -> PublicLotto:
+    """What a client may see of a property (share page and client area)."""
     d = build_detail(db, lot)
     cur = current_vendita(lot)
     # Whitelist: only property facts. Notes, clients, events and contacts never leave the firm.
@@ -57,7 +61,7 @@ def public_lotto(token: str, db: Session = Depends(get_db)) -> PublicLotto:
         rounds=_rounds(lot),
         allegati=documents(lot),
         pvp_url=d.pvp_url if cur else None,
-        expires_at=s.expires_at,
+        expires_at=expires_at,
         eur_mq=d.eur_mq,
         eur_mq_stima=d.eur_mq_stima,
         sconto_zona_pct=d.sconto_zona_pct,

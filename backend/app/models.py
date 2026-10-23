@@ -359,6 +359,14 @@ class User(Base):
     # sessions issued before this are rejected (password changed or reset)
     password_changed_at: Mapped[datetime | None] = mapped_column(TS)
     last_login_at: Mapped[datetime | None] = mapped_column(TS)
+    # set for a client's login to the client area; staff accounts have none
+    cliente_id: Mapped[int | None] = mapped_column(ForeignKey("clienti.id", ondelete="CASCADE"), index=True)
+
+    cliente: Mapped[Cliente | None] = relationship(back_populates="accounts")
+
+    @property
+    def is_client(self) -> bool:
+        return self.cliente_id is not None
 
     @property
     def pending_invite(self) -> bool:
@@ -417,6 +425,10 @@ class Cliente(Base):
     created_at: Mapped[datetime] = mapped_column(TS, server_default=func.now())
 
     links: Mapped[list[LottoCliente]] = relationship(back_populates="cliente", cascade="all, delete-orphan")
+    # logins to the client area; the database deletes them with the client (GDPR erasure)
+    accounts: Mapped[list[User]] = relationship(
+        back_populates="cliente", cascade="all, delete-orphan", passive_deletes=True, order_by="User.name"
+    )
 
 
 class LottoCliente(Base):
@@ -427,6 +439,9 @@ class LottoCliente(Base):
     cliente_id: Mapped[int] = mapped_column(ForeignKey("clienti.id", ondelete="CASCADE"), index=True)
     status: Mapped[str] = mapped_column(String(30), default="in_valutazione")
     updated_at: Mapped[datetime] = mapped_column(TS, server_default=func.now(), onupdate=func.now())
+    # shown in the client's area (unless hidden), with an optional message from the firm
+    nel_portale: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
+    nota_cliente: Mapped[str | None] = mapped_column(Text)
 
     cliente: Mapped[Cliente] = relationship(back_populates="links")
     lotto: Mapped[Lotto] = relationship()

@@ -56,7 +56,8 @@ def clear_session(response: Response) -> None:
     response.delete_cookie(s.cookie_name, path="/", secure=s.cookie_secure, samesite=s.cookie_samesite)  # type: ignore[arg-type]
 
 
-def current_user(request: Request, db: Session = Depends(get_db)) -> User:
+def session_user(request: Request, db: Session = Depends(get_db)) -> User:
+    """Anyone logged in: staff or a client. Only /auth uses this directly."""
     s = get_settings()
     token = request.cookies.get(s.cookie_name)
     if not token:
@@ -70,6 +71,20 @@ def current_user(request: Request, db: Session = Depends(get_db)) -> User:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Utente non attivo")
     if payload.get("pwv", 0) != _password_version(user):  # password changed or reset since login
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Sessione scaduta")
+    return user
+
+
+def current_user(user: User = Depends(session_user)) -> User:
+    """Staff only. Every router of the firm's app depends on this, so a client login can never
+    reach the map, the clients, the notes or the admin."""
+    if user.is_client:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Area riservata allo studio")
+    return user
+
+
+def client_user(user: User = Depends(session_user)) -> User:
+    if not user.is_client:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Area riservata ai clienti")
     return user
 
 
