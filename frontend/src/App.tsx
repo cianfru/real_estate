@@ -11,6 +11,8 @@ const Clienti = lazy(() => import("@/pages/Clienti"));
 const Admin = lazy(() => import("@/pages/Admin"));
 const Mercato = lazy(() => import("@/pages/Mercato"));
 const PublicShare = lazy(() => import("@/pages/PublicShare"));
+const Access = lazy(() => import("@/pages/Access"));
+const Account = lazy(() => import("@/pages/Account"));
 
 function Loading() {
   return (
@@ -34,12 +36,14 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/s/:token" element={<PublicShare />} />
+        <Route path="/accesso/:token" element={<Access />} />
         <Route path="/" element={<RequireAuth><Explore /></RequireAuth>} />
         <Route path="/lotti/:id" element={<RequireAuth><LottoPage /></RequireAuth>} />
         <Route path="/mercato" element={<RequireAuth><Mercato /></RequireAuth>} />
         <Route path="/ricerche" element={<RequireAuth><SavedSearches /></RequireAuth>} />
         <Route path="/clienti" element={<RequireAuth><Clienti /></RequireAuth>} />
         <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
+        <Route path="/account" element={<RequireAuth><Account /></RequireAuth>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>

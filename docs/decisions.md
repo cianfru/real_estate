@@ -29,6 +29,7 @@
 | D23 | PVP's 2025 coverage hole is detected from the data; first sales in the 12 months after it are not used as appraisals and the index shows a gap | otherwise reduced rounds read as low appraisals and fake a −39% trend |
 | D24 | Price index = rolling 12-month median per quarter, ≥ 3 own and ≥ 8 window observations, never across a gap | provinces have 20–40 priced sales a quarter; raw quarters are noise |
 | D25 | Hosting: Railway Hobby (web + nightly cron from one image) and Neon free for Postgres/PostGIS; no Vercel | Vercel's Hobby plan is "restricted to non-commercial personal use only" (Fair Use Guidelines) and Pro is paid per member; the firm already has Railway Hobby |
+| D26 | Staff accounts are managed from the Admin page by invitation: the person gets a one-time link (hashed in the database, 7 days) and chooses their own password; resets work the same way; deactivation and password changes end open sessions at once | nobody knows anyone else's password, no terminal after setup, works without email (the admin copies the link) |
 
 ## Known limitations
 

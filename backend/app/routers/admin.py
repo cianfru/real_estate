@@ -1,6 +1,6 @@
 import logging
 import threading
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -9,11 +9,13 @@ from sqlalchemy.orm import Session
 
 from app.auth import admin_user, current_user
 from app.db import get_db
-from app.models import Evento, IngestRun, Lotto, Tribunale, User, Vendita
+from app.models import Evento, IngestRun, Lotto, StoricoVendita, Tribunale, User, Vendita
 from app.schemas import IngestRunOut, TribunaleOut
 
 router = APIRouter(prefix="/admin", tags=["admin"], dependencies=[Depends(current_user)])
 log = logging.getLogger("app.admin")
+
+HISTORY_SINCE = date(2019, 1, 1)
 
 
 @router.get("/runs", response_model=list[IngestRunOut])
@@ -32,6 +34,13 @@ def stats(db: Session = Depends(get_db)) -> dict[str, Any]:
         "active_without_coords": db.scalar(select(func.count()).where(active, Lotto.geom.is_(None))),
         "active_with_detail": db.scalar(select(func.count()).where(active, Lotto.has_detail.is_(True))),
         "approx_coords": db.scalar(select(func.count()).where(active, Lotto.geocode_source == "comune")),
+        "storico": dict(
+            zip(
+                ("rows", "since"),
+                db.execute(select(func.count(), func.min(StoricoVendita.data_vendita))).one(),
+                strict=True,
+            )
+        ),
         "eventi_7d": dict(
             db.execute(
                 select(Evento.tipo, func.count())
@@ -61,19 +70,42 @@ def _run_in_background(scope: str) -> None:
         log.exception("manual sync failed")
 
 
-@router.post("/sync", status_code=202)
-def trigger_sync(scope: str = "veneto", db: Session = Depends(get_db), _: User = Depends(admin_user)) -> dict[str, str]:
-    if scope not in ("veneto", "italy"):
-        raise HTTPException(422, "scope deve essere veneto o italy")
+def _history_in_background() -> None:
+    from ingest.jobs import analytics, history
+
+    try:
+        history("italy", HISTORY_SINCE)
+        analytics()
+    except Exception:  # noqa: BLE001 - recorded in ingest_runs by the job itself
+        log.exception("market history load failed")
+
+
+def _refuse_if_running(db: Session) -> None:
     running = db.scalar(
         select(IngestRun).where(
             IngestRun.status == "running", IngestRun.started_at > datetime.now(UTC) - timedelta(hours=3)
         )
     )
     if running:
-        raise HTTPException(409, f"Una sincronizzazione è già in corso (run #{running.id})")
+        raise HTTPException(409, f"Un'elaborazione è già in corso (run #{running.id})")
+
+
+@router.post("/sync", status_code=202)
+def trigger_sync(scope: str = "veneto", db: Session = Depends(get_db), _: User = Depends(admin_user)) -> dict[str, str]:
+    if scope not in ("veneto", "italy"):
+        raise HTTPException(422, "scope deve essere veneto o italy")
+    _refuse_if_running(db)
     threading.Thread(target=_run_in_background, args=(scope,), daemon=True).start()
     return {"status": "started", "scope": scope}
+
+
+@router.post("/history", status_code=202)
+def trigger_history(db: Session = Depends(get_db), _: User = Depends(admin_user)) -> dict[str, str]:
+    """(Re)load the national market history since 2019 (≈ 500 PVP requests, ~10 minutes), then
+    recompute zone values. Safe to repeat: rows are upserted."""
+    _refuse_if_running(db)
+    threading.Thread(target=_history_in_background, daemon=True).start()
+    return {"status": "started"}
 
 
 @router.get("/tribunali", response_model=list[TribunaleOut])

@@ -51,3 +51,18 @@ def test_without_a_build_only_the_api_is_served(tmp_path: Path) -> None:
     c = TestClient(create_site(tmp_path))
     assert c.get("/").status_code == 404
     assert c.get("/api/lotti").status_code == 401
+
+
+def test_first_admin_from_environment(tmp_path: Path, db: Any, monkeypatch: pytest.MonkeyPatch) -> None:
+    from app.config import get_settings
+
+    s = get_settings()
+    monkeypatch.setattr(s, "admin_email", "Avv@Example.org")
+    monkeypatch.setattr(s, "admin_password", "password-lunga")
+    with TestClient(create_site(tmp_path)) as c:
+        r = c.post("/api/auth/login", json={"email": "avv@example.org", "password": "password-lunga"}, headers=H)
+        assert r.status_code == 200 and r.json()["is_admin"]
+    monkeypatch.setattr(s, "admin_email", "altro@example.org")
+    with TestClient(create_site(tmp_path)):
+        pass  # users exist: the variables are ignored
+    assert [u.email for u in db.query(User).all()] == ["avv@example.org"]

@@ -356,6 +356,30 @@ class User(Base):
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
     created_at: Mapped[datetime] = mapped_column(TS, server_default=func.now())
+    # sessions issued before this are rejected (password changed or reset)
+    password_changed_at: Mapped[datetime | None] = mapped_column(TS)
+    last_login_at: Mapped[datetime | None] = mapped_column(TS)
+
+    @property
+    def pending_invite(self) -> bool:
+        """Invited, password not chosen yet (an empty hash never verifies)."""
+        return not self.password_hash
+
+
+class PasswordToken(Base):
+    """One-time link to choose a password: an invitation or a reset. Only the SHA-256 of the
+    token is stored, so the table is useless to whoever reads it."""
+
+    __tablename__ = "password_tokens"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    purpose: Mapped[str] = mapped_column(String(10))  # invite | reset
+    created_at: Mapped[datetime] = mapped_column(TS, server_default=func.now())
+    expires_at: Mapped[datetime] = mapped_column(TS)
+    used_at: Mapped[datetime | None] = mapped_column(TS)
+    created_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
 
 
 class SavedSearch(Base):

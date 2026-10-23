@@ -2,8 +2,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Page } from "@/components/AppShell";
 import { Button, Rule, SectionTitle, Segmented, Select, Spinner, cx } from "@/components/ui";
+import { UsersAdmin } from "@/components/UsersAdmin";
 import { api, patch, post } from "@/lib/api";
-import { dateTime, relative } from "@/lib/format";
+import { date, dateTime, relative } from "@/lib/format";
 import { label, useMe, useMeta } from "@/lib/hooks";
 import type { AdminStats, IngestRun, TribunaleMeta } from "@/lib/types";
 
@@ -35,6 +36,7 @@ export default function Admin() {
   const stats = useQuery({ queryKey: ["stats"], queryFn: () => api<AdminStats>("/admin/stats"), refetchInterval: 30_000 });
   const trib = useQuery({ queryKey: ["admin-trib"], queryFn: () => api<TribunaleMeta[]>("/admin/tribunali") });
   const sync = useMutation({ mutationFn: () => post(`/admin/sync?scope=${scope}`), onSuccess: () => setTimeout(() => qc.invalidateQueries({ queryKey: ["runs"] }), 800) });
+  const history = useMutation({ mutationFn: () => post("/admin/history"), onSuccess: () => setTimeout(() => qc.invalidateQueries({ queryKey: ["runs"] }), 800) });
   const setActive = useMutation({
     mutationFn: ({ id, active }: { id: number; active: boolean }) => patch(`/admin/tribunali/${id}?active=${active}`),
     onSuccess: () => {
@@ -62,7 +64,7 @@ export default function Admin() {
         )
       }
     >
-      {sync.error && <p className="mb-6 text-[13px] text-bad">{(sync.error as Error).message}</p>}
+      {(sync.error ?? history.error) && <p className="mb-6 text-[13px] text-bad">{((sync.error ?? history.error) as Error).message}</p>}
       {!s ? (
         <Spinner />
       ) : (
@@ -72,6 +74,13 @@ export default function Admin() {
             <Figure label="Con posizione" value={s.active_with_coords} sub={`${s.approx_coords} approssimative, ${s.active_without_coords} da geocodificare`} />
             <Figure label="Con dettaglio completo" value={s.active_with_detail} sub="tribunali attivi e richieste manuali" />
           </div>
+
+          {me?.is_admin && (
+            <>
+              <Rule className="my-14" />
+              <UsersAdmin />
+            </>
+          )}
 
           <Rule className="my-14" />
 
@@ -90,6 +99,21 @@ export default function Admin() {
                   ))}
                 </dl>
               )}
+
+              <div className="mt-12">
+                <SectionTitle>Storico di mercato</SectionTitle>
+                <p className="text-[13.5px] leading-relaxed text-muted">
+                  {s.storico.rows
+                    ? `${s.storico.rows.toLocaleString("it-IT")} vendite dal ${date(s.storico.since)}: la base dei valori di zona e del grafico prezzi. Si aggiorna da sola ogni notte.`
+                    : "Non ancora caricato: senza storico la pagina Mercato e i valori di zona restano vuoti."}
+                </p>
+                {me?.is_admin && (
+                  <Button variant={s.storico.rows ? "ghost" : "gold"} className="mt-3" loading={history.isPending || running} onClick={() => history.mutate()}>
+                    {s.storico.rows ? "Ricarica tutto lo storico" : "Carica lo storico"}
+                  </Button>
+                )}
+                {me?.is_admin && <p className="mt-1.5 text-[11.5px] text-faint">Circa 10 minuti, poi ricalcola valori di zona e opportunità.</p>}
+              </div>
             </section>
             <section>
               <SectionTitle>Tribunali con dettaglio, storico e geocodifica</SectionTitle>

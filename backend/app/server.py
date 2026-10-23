@@ -8,7 +8,8 @@ API. Development keeps `app.main:app` (API at the root) behind Vite's /api proxy
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
@@ -18,8 +19,10 @@ from fastapi.responses import FileResponse, Response
 from starlette.staticfiles import StaticFiles
 
 from app.config import get_settings
+from app.db import SessionLocal
 from app.main import app as api
 from app.main import health
+from app.services.accounts import bootstrap_admin
 
 SECURITY_HEADERS = {
     "X-Robots-Tag": "noindex, nofollow",
@@ -38,8 +41,18 @@ class _HashedAssets(StaticFiles):
         return response
 
 
+@asynccontextmanager
+async def _lifespan(_: FastAPI) -> AsyncIterator[None]:
+    db = SessionLocal()
+    try:
+        bootstrap_admin(db)
+    finally:
+        db.close()
+    yield
+
+
 def create_site(dist: Path | None) -> FastAPI:
-    site = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+    site = FastAPI(docs_url=None, redoc_url=None, openapi_url=None, lifespan=_lifespan)
     site.add_middleware(GZipMiddleware, minimum_size=1024)
 
     @site.middleware("http")

@@ -45,6 +45,7 @@ variable `NIGHTLY_ON_GITHUB=true`), with the Railway cron service removed.
    | `PUBLIC_APP_URL` | `https://<the domain from the next step>` (used in share links and emails) |
    | `NOMINATIM_EMAIL` | the firm's address (Nominatim's usage policy asks for a contact) |
    | `RESEND_API_KEY`, `EMAIL_FROM` | optional, see step 7 |
+   | `ADMIN_EMAIL`, `ADMIN_NAME`, `ADMIN_PASSWORD` | the first admin (step 4); remove `ADMIN_PASSWORD` after logging in |
 
    *Settings → Networking → Generate domain* (or add `aste.legalestateitalia.it` as a custom
    domain). Migrations run at every start. Check `https://<domain>/health` → `{"status":"ok"}`.
@@ -54,24 +55,19 @@ variable `NIGHTLY_ON_GITHUB=true`), with the Railway cron service removed.
    02:17 in winter). Same branch as `web`. *Variables*: reference the web service's, e.g.
    `DATABASE_URL=${{web.DATABASE_URL}}`, and the same for `JWT_SECRET`, `PUBLIC_APP_URL`,
    `NOMINATIM_EMAIL`, `RESEND_API_KEY`, `EMAIL_FROM`.
-4. **Staff users.** With the Railway CLI (`npm i -g @railway/cli`, `railway login`,
-   `railway link`):
-   ```
-   railway ssh --service web
-   python -m ingest create-user avv.vella@legalestateitalia.it "Mariagiovanna Vella" --admin
-   python -m ingest create-user collaboratore@legalestateitalia.it "Nome Cognome"
-   ```
-   The password is prompted (min 10 characters). Running the command again for an existing
-   email resets the password.
+4. **First admin.** With `ADMIN_EMAIL`, `ADMIN_NAME` and `ADMIN_PASSWORD` (≥ 10 characters) set
+   on `web`, the app creates that admin at startup, **only while there are no users at all**. Log
+   in, then delete `ADMIN_PASSWORD` from the variables. Everyone else is invited from
+   **Admin → Persone dello studio**: name + email, and the person gets a one-time link to choose
+   their own password (emailed when Resend is configured, otherwise copy it from the page and send
+   it yourself). No terminal needed. (Emergency door: `railway ssh --service web`, then
+   `python -m ingest create-user <email> "<name>" --admin`.)
 5. **First sync.** Log in → Admin → "Avvia sincronizzazione" (Italia). ~20 minutes, ≈ 1,000 PVP
    requests. The first sync is a silent *bootstrap*: no events, no alert emails.
-6. **Market history**, once, from `railway ssh --service web`:
-   ```
-   nohup sh -c 'python -m ingest history --scope italy --since 2019-01-01 && python -m ingest analytics' > /tmp/history.log 2>&1 &
-   ```
-   ≈ 500 PVP requests, about 10 minutes, then ≈ 30 s of analysis (`tail -f /tmp/history.log`; it
-   keeps running if the SSH session drops). Until this has run the Mercato page and the zone layer
-   are empty. The first analysis with data is silent (no opportunity events).
+6. **Market history**, once: Admin → *Storico di mercato* → "Carica lo storico". ≈ 500 PVP
+   requests, about 10 minutes, then ≈ 30 s of analysis; progress in *Esecuzioni*. Until this has
+   run the Mercato page and the zone layer are empty. The first analysis with data is silent (no
+   opportunity events).
 7. **Resend (optional).** Verify the sending domain (`legalestateitalia.it`) in Resend, then set
    `RESEND_API_KEY` and `EMAIL_FROM` on `web` (the cron references them). Without a key, alerts
    are written to the log.
@@ -104,11 +100,12 @@ Every step writes a row in `ingest_runs`, visible on the **Admin** page with cou
 | enrich another court | Admin page → "Attiva un altro tribunale", or `python -m ingest tribunali --activate 0280600097` |
 | geocode now | `python -m ingest geocode --limit 300` |
 | recompute zone values and opportunities | `python -m ingest analytics` |
-| reload market history | `python -m ingest history --scope italy --since 2019-01-01` (idempotent upsert) |
+| reload market history | Admin → *Storico di mercato* → "Ricarica tutto lo storico" (idempotent upsert) |
 | change the opportunity thresholds | set `OPPORTUNITY_THRESHOLD_PCT` / `OPPORTUNITY_AUCTION_PCT` on the cron service, then run `analytics` |
 | resend today's alerts | `python -m ingest alerts --run-id <sync run id>` (already-sent events are skipped) |
-| reset a password | `python -m ingest create-user <email> "<name>"` again |
-| disable a user | `UPDATE users SET is_active = false WHERE email = '...';` |
+| invite a person | Admin → *Persone dello studio* → name, email, "Invita" |
+| forgotten password | the person uses "Password dimenticata?" on the login page (needs Resend), or Admin → "Link per nuova password" |
+| disable / re-enable a person | Admin → "Disattiva" / "Riattiva" (their open sessions stop at once) |
 
 ## When PVP changes
 
@@ -141,7 +138,7 @@ Symptoms: a run on the Admin page is **failed** with `SchemaDriftError`, or `Pvp
 | `JWT_SECRET` | change it on Railway (API service) and redeploy: everyone is logged out |
 | `DATABASE_URL` | rotate the password in Neon/Railway, update both Railway services (and GitHub secret if used) |
 | `RESEND_API_KEY` | create a new key in Resend, update both services, delete the old key |
-| staff password | `python -m ingest create-user <email> "<name>"` |
+| staff password | Admin → "Link per nuova password"; changing it logs out the person's other sessions |
 
 ## Backups
 

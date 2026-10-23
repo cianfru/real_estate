@@ -8,7 +8,7 @@ analytics                                  zone values, price index, opportuniti
 alerts [--run-id N]                        send saved-search digests
 nightly [--scope italy] [--no-alerts]      sync + geocode + analytics + alerts (what the cron runs)
 tribunali [--activate CODE] [--deactivate CODE]
-create-user EMAIL NAME [--admin]           password is prompted (or $LE_PASSWORD)
+create-user EMAIL NAME [--admin]           first admin / emergency reset; password prompted (or $LE_PASSWORD)
 """
 
 from __future__ import annotations
@@ -141,23 +141,25 @@ def _tribunali(activate: str | None, deactivate: str | None) -> int:
 
 
 def _create_user(email: str, name: str, admin: bool) -> int:
-    from app.auth import hash_password
+    """The first admin (and an emergency door); everyone else is invited from the Admin page."""
     from app.db import SessionLocal
     from app.models import User
+    from app.services.accounts import password_problem, set_password
 
     pw = os.environ.get("LE_PASSWORD") or getpass.getpass("Password: ")
-    if len(pw) < 10:
-        print("La password deve avere almeno 10 caratteri", file=sys.stderr)
-        return 1
     db = SessionLocal()
     user = db.scalar(select(User).where(User.email == email.lower()))
     if user is None:
-        user = User(email=email.lower(), name=name, password_hash=hash_password(pw), is_admin=admin)
+        user = User(email=email.lower(), name=name, password_hash="", is_admin=admin)
         db.add(user)
         action = "creato"
     else:
-        user.name, user.password_hash, user.is_admin, user.is_active = name, hash_password(pw), admin, True
+        user.name, user.is_admin, user.is_active = name, admin, True
         action = "aggiornato"
+    if problem := password_problem(pw, user):
+        print(problem, file=sys.stderr)
+        return 1
+    set_password(user, pw)
     db.commit()
     print(f"Utente {email} {action}{' (admin)' if admin else ''}")
     return 0

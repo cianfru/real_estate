@@ -22,6 +22,7 @@ and keep them current.
 - Filters: `schemas.LottoFilters` ↔ `services/lotti_query.apply_filters` ↔ `frontend/src/lib/filters.ts`
 - Lot identity and events: `ingest/sync.py` (see docs/data-model.md "Lot identity")
 - Property card: `frontend/src/components/LottoCard.tsx` + `LottoParts.tsx`
+- Staff accounts: `app/routers/users.py` (Admin page) + `app/services/accounts.py` (one-time links)
 - Production entry point: `backend/app/server.py` (website at `/`, API at `/api`), root `Dockerfile`,
   `railway.json` (web) and `railway.cron.json` (nightly); see docs/runbook.md
 - Zone values, price index, opportunities: `ingest/analytics.py` (method in docs/market-analysis.md);

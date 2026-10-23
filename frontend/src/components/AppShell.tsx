@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
-import { LogOut, Moon, Sun } from "lucide-react";
+import { LogOut, Moon, Sun, UserRound } from "lucide-react";
 import type { ReactNode } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useLogout, useMe, useTheme } from "@/lib/hooks";
 import { Logo } from "./Logo";
 import { IconButton, cx } from "./ui";
@@ -18,6 +18,7 @@ export function TopBar({ floating }: { floating?: boolean }) {
   const { data: me } = useMe();
   const { theme, toggle } = useTheme();
   const logout = useLogout();
+  const nav = useNavigate();
   return (
     <header
       className={cx(
@@ -48,7 +49,14 @@ export function TopBar({ floating }: { floating?: boolean }) {
         ))}
       </nav>
       <div className="flex shrink-0 items-center gap-2">
-        {me && <span className="hidden text-[13px] text-muted lg:inline">{me.name}</span>}
+        {me && (
+          <NavLink to="/account" className={({ isActive }) => cx("hidden text-[13px] hover:text-ink lg:inline", isActive ? "text-ink" : "text-muted")}>
+            {me.name}
+          </NavLink>
+        )}
+        <span className="lg:hidden">
+          <IconButton label="Il tuo account" icon={<UserRound className="size-4" />} onClick={() => nav("/account")} />
+        </span>
         <IconButton label={theme === "dark" ? "Tema chiaro" : "Tema scuro"} icon={theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />} onClick={toggle} />
         <IconButton label="Esci" icon={<LogOut className="size-4" />} onClick={logout} />
       </div>

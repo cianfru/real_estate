@@ -115,7 +115,13 @@ Rebuilt by `python -m ingest analytics`; see `docs/market-analysis.md`. No perso
 
 ## App tables
 
-- `users`: staff only, argon2 hashes, `is_admin`. Created by `python -m ingest create-user`.
+- `users`: staff only, argon2 hashes, `is_admin`, `is_active`, `last_login_at`,
+  `password_changed_at` (sessions carry a password version, so a change or reset logs out every
+  other session). An invited person has an empty hash until they choose a password. Managed from
+  the Admin page; the first admin comes from `ADMIN_EMAIL`/`ADMIN_PASSWORD` or
+  `python -m ingest create-user`.
+- `password_tokens`: one-time links (`invite` 7 days, `reset` 24 hours). Only the SHA-256 of the
+  token is stored; a new link cancels the person's earlier unused ones.
 - `saved_searches`: `criteria` (jsonb: the same `LottoFilters` the list uses), optional `polygon`
   (GeoJSON), `alert_enabled`.
 - `alert_log`: one row per (user, evento) sent; the unique constraint guarantees an event is never

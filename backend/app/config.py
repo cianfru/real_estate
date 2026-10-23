@@ -21,6 +21,12 @@ class Settings(BaseSettings):
     # Built React app (frontend/dist) served by app.server at /. Set in the Docker image.
     frontend_dir: str = ""
 
+    # First admin, created at startup only while there are no users at all (no terminal needed).
+    # Remove ADMIN_PASSWORD once you have logged in; everyone else is invited from the Admin page.
+    admin_email: str = ""
+    admin_name: str = "Amministratore"
+    admin_password: str = ""
+
     # GDPR: delegato/custode names and contacts are only stored when this is on.
     store_professional_contacts: bool = False
 

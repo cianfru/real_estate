@@ -9,6 +9,7 @@ of the **Portale delle Vendite Pubbliche** (`pvp.giustizia.it`), at near-zero ru
   Treviso, Venezia, Rovigo), any other court on demand
 - Map + list with filters, polygon search, property card with round timeline and discounts
 - Internal notes, client links, read-only share links for clients
+- Staff accounts managed from the Admin page: invitations by link, password resets, deactivation
 - Saved searches with a morning email digest of new lots, new rounds, price drops and new
   opportunities
 - **Market analysis**: appraised €/m² per zone (≈2 km hexagons, comuni, provinces) from ~250,000
@@ -42,7 +43,7 @@ python -m venv .venv && . .venv/bin/activate
 pip install -e ".[dev]"
 cp .env.example .env                         # adjust DATABASE_URL / JWT_SECRET
 alembic upgrade head
-python -m ingest create-user you@example.org "Your Name" --admin
+python -m ingest create-user you@example.org "Your Name" --admin   # first admin; invite the rest from Admin
 python -m ingest sync --scope veneto         # ~10 min the first time (polite: 1 req/s)
 python -m ingest history --scope italy --since 2019-01-01   # market history, ~10 min, once
 python -m ingest analytics                   # zone values and opportunities, ~20 s

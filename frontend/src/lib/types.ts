@@ -255,6 +255,27 @@ export interface User {
   is_admin: boolean;
 }
 
+export interface AdminUser extends User {
+  is_active: boolean;
+  pending_invite: boolean;
+  created_at: string;
+  last_login_at: string | null;
+}
+
+/** A one-time link to choose a password: shown to the admin, emailed when email is set up. */
+export interface PasswordLink {
+  user: AdminUser;
+  link: string;
+  purpose: "invite" | "reset";
+  emailed: boolean;
+}
+
+export interface TokenInfo {
+  email: string;
+  name: string;
+  purpose: "invite" | "reset";
+}
+
 export interface SavedSearch {
   id: number;
   name: string;
@@ -306,6 +327,7 @@ export interface AdminStats {
   approx_coords: number;
   eventi_7d: Record<string, number>;
   by_tribunale: { id: number; name: string; active: boolean; count: number }[];
+  storico: { rows: number; since: string | null };
 }
 
 export type GeoCollection = GeoJSON.FeatureCollection<GeoJSON.Point, GeoFeatureProps>;

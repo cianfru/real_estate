@@ -6,7 +6,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 SortKey = Literal[
     "data_vendita", "termine", "prezzo_asc", "prezzo_desc", "ribasso", "nuovi", "superficie", "opportunita", "eur_mq"
@@ -349,6 +349,56 @@ class UserOut(BaseModel):
     email: str
     name: str
     is_admin: bool
+
+
+class AdminUserOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    email: str
+    name: str
+    is_admin: bool
+    is_active: bool
+    pending_invite: bool
+    created_at: datetime
+    last_login_at: datetime | None
+
+
+class UserCreateIn(BaseModel):
+    email: EmailStr
+    name: str = Field(min_length=1, max_length=200)
+    is_admin: bool = False
+
+
+class UserPatchIn(BaseModel):
+    name: str | None = Field(None, min_length=1, max_length=200)
+    is_admin: bool | None = None
+    is_active: bool | None = None
+
+
+class PasswordLinkOut(BaseModel):
+    user: AdminUserOut
+    link: str
+    purpose: Literal["invite", "reset"]
+    emailed: bool
+
+
+class TokenInfoOut(BaseModel):
+    email: str
+    name: str
+    purpose: Literal["invite", "reset"]
+
+
+class SetPasswordIn(BaseModel):
+    password: str = Field(max_length=200)
+
+
+class ChangePasswordIn(BaseModel):
+    current_password: str = Field(max_length=200)
+    new_password: str = Field(max_length=200)
+
+
+class ForgotPasswordIn(BaseModel):
+    email: str = Field(min_length=3, max_length=200)
 
 
 class IngestRunOut(BaseModel):

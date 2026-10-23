@@ -1,5 +1,6 @@
 """Staff authentication: argon2 password hashes, JWT in an httpOnly cookie.
-Accounts are created from the CLI only (`python -m ingest create-user`); there is no sign-up."""
+There is no sign-up: an admin invites people from the Admin page (app.routers.users), or the
+first admin is created with `python -m ingest create-user`."""
 
 from __future__ import annotations
 
@@ -29,10 +30,16 @@ def verify_password(pw: str, hashed: str) -> bool:
         return False
 
 
+def _password_version(user: User) -> int:
+    """Changes whenever the password does, so sessions opened before a change stop working."""
+    return int(user.password_changed_at.timestamp() * 1000) if user.password_changed_at else 0
+
+
 def issue_session(response: Response, user: User) -> None:
     s = get_settings()
     exp = datetime.now(UTC) + timedelta(hours=s.jwt_ttl_hours)
-    token = jwt.encode({"sub": str(user.id), "exp": exp}, s.jwt_secret, algorithm="HS256")
+    claims = {"sub": str(user.id), "pwv": _password_version(user), "exp": exp}
+    token = jwt.encode(claims, s.jwt_secret, algorithm="HS256")
     response.set_cookie(
         s.cookie_name,
         token,
@@ -61,6 +68,8 @@ def current_user(request: Request, db: Session = Depends(get_db)) -> User:
     user = db.get(User, int(payload["sub"]))
     if user is None or not user.is_active:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Utente non attivo")
+    if payload.get("pwv", 0) != _password_version(user):  # password changed or reset since login
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Sessione scaduta")
     return user
 
 
