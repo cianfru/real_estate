@@ -144,7 +144,7 @@ export default function Explore() {
 
       {/* map tools: plain text controls on one quiet surface */}
       <div className="absolute top-[76px] right-3 z-20 w-[228px] space-y-2">
-        <div className="glass rounded-lg px-4 py-2.5 shadow-soft">
+        <div className="glass-panel rounded-lg px-4 py-2.5 shadow-soft">
           <MapControl on={areaOn} onClick={() => setAreaOn(!areaOn)}>
             Elenco segue la mappa
           </MapControl>
@@ -177,7 +177,7 @@ export default function Explore() {
             exit={{ opacity: 0, x: -12 }}
             transition={{ type: "spring", stiffness: 380, damping: 34 }}
             className={cx(
-              "glass absolute z-30 flex flex-col overflow-hidden shadow-float",
+              "glass-panel absolute z-30 flex flex-col overflow-hidden shadow-float",
               desktop ? "top-[76px] bottom-3 left-3 w-[432px] rounded-xl" : "inset-x-0 top-[72px] bottom-0 rounded-t-xl",
             )}
           >
@@ -267,7 +267,7 @@ export default function Explore() {
 
       {/* mobile switch: a quiet text bar, no pill */}
       {!desktop && selectedId === null && (
-        <div className="glass absolute inset-x-0 bottom-0 z-40 flex justify-center gap-10 py-3.5 shadow-float">
+        <div className="glass-panel absolute inset-x-0 bottom-0 z-40 flex justify-center gap-10 py-3.5 shadow-float">
           {(["map", "list"] as const).map((v) => (
             <button
               key={v}

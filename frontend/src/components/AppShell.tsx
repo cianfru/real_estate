@@ -25,7 +25,7 @@ export function TopBar({ floating }: { floating?: boolean }) {
     <header
       className={cx(
         "no-print z-40 flex h-14 items-center gap-6 px-4 sm:px-6",
-        floating ? "glass absolute top-3 right-3 left-3 rounded-xl shadow-soft" : "glass sticky top-0",
+        floating ? "glass-panel absolute top-3 right-3 left-3 rounded-xl shadow-soft" : "glass sticky top-0",
       )}
     >
       <NavLink to={me?.role === "client" ? "/portale" : "/"} className="shrink-0">

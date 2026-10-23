@@ -466,7 +466,7 @@ export function MapLegend({ zoneBreaks }: { zoneBreaks?: number[] }) {
   const ramp = theme === "dark" ? ZONE_RAMP_DARK : ZONE_RAMP_LIGHT;
   const fmt = (v: number) => `€ ${Math.round(v).toLocaleString("it-IT")}`;
   return (
-    <div className="glass rounded-lg px-4 py-3 text-[11.5px] text-muted shadow-soft">
+    <div className="glass-panel rounded-lg px-4 py-3 text-[11.5px] text-muted shadow-soft">
       <div className="grid gap-1.5">
         <span className="flex items-center gap-2.5">
           <span className="size-2.5 rounded-full bg-[#0b263b] dark:bg-[#c9d3dc]" />

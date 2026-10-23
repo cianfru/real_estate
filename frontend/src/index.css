@@ -9,6 +9,8 @@
   --surface: #fdfcfa;
   --surface-2: #f1efea;
   --glass: rgb(253 252 250 / 0.78);
+  /* surfaces floating over the map: near-solid, so markers don't show through the text */
+  --panel: rgb(253 252 250 / 0.95);
   --text: #14202b;
   --muted: #66707a;
   --faint: #9aa1a8;
@@ -38,6 +40,7 @@
   --surface: #111a23;
   --surface-2: #17222d;
   --glass: rgb(17 26 35 / 0.78);
+  --panel: rgb(17 26 35 / 0.95);
   --text: #e9ecef;
   --muted: #98a3ad;
   --faint: #66727d;
@@ -114,6 +117,12 @@ body {
   -webkit-backdrop-filter: saturate(180%) blur(20px);
 }
 
+.glass-panel {
+  background: var(--panel);
+  backdrop-filter: saturate(160%) blur(24px);
+  -webkit-backdrop-filter: saturate(160%) blur(24px);
+}
+
 
 .scroll-thin {
   scrollbar-width: thin;
@@ -127,7 +136,7 @@ body {
 
 /* MapLibre controls in our palette */
 .maplibregl-ctrl-group {
-  background: var(--glass) !important;
+  background: var(--panel) !important;
   backdrop-filter: blur(16px);
   border-radius: 10px !important;
   box-shadow: var(--shadow) !important;
