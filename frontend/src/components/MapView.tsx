@@ -83,6 +83,18 @@ function zoneColor(breaks: number[], dark: boolean): maplibregl.ExpressionSpecif
   return expr as maplibregl.ExpressionSpecification;
 }
 
+/** Place names in Italian (Padova, Venezia, Lombardia, Austria…), else the local name. The
+ * OpenFreeMap styles default to English; the tiles carry `name:it` for most places. */
+function italianLabels(map: maplibregl.Map) {
+  for (const layer of map.getStyle().layers ?? []) {
+    if (layer.type !== "symbol") continue;
+    const field = map.getLayoutProperty(layer.id, "text-field");
+    if (field && JSON.stringify(field).includes("name")) {
+      map.setLayoutProperty(layer.id, "text-field", ["coalesce", ["get", "name:it"], ["get", "name"]]);
+    }
+  }
+}
+
 function addLayers(map: maplibregl.Map, dark: boolean, breaks: number[]) {
   if (!map.getSource("lotti")) {
     map.addSource("lotti", {
@@ -371,6 +383,7 @@ export function MapView(props: Props) {
     const map = mapRef.current;
     if (!map) return;
     const apply = () => {
+      italianLabels(map);
       addLayers(map, theme === "dark", propsRef.current.zoneBreaks ?? []);
       if (propsRef.current.data) (map.getSource("lotti") as GeoJSONSource | undefined)?.setData(propsRef.current.data);
       (map.getSource("zones") as GeoJSONSource | undefined)?.setData(propsRef.current.zones ?? { type: "FeatureCollection", features: [] });

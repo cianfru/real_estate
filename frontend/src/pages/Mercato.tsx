@@ -1,15 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, ChartNoAxesColumn } from "lucide-react";
 import { useMemo } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Page } from "@/components/AppShell";
 import { Columns, Legend, LineChart, Scatter, TableToggle, fmtEurMq, type XBand } from "@/components/charts";
 import { Thumb } from "@/components/LottoRow";
 import { MapLegend, MapView, quantileBreaks, useZones } from "@/components/MapView";
-import { Rule, SectionTitle, Segmented, Select, Spinner, cx } from "@/components/ui";
-import { api } from "@/lib/api";
+import { Button, Empty, Rule, SectionTitle, Segmented, Select, Spinner, cx } from "@/components/ui";
+import { api, post } from "@/lib/api";
 import { date, eur, pct, relative } from "@/lib/format";
+import { useMe } from "@/lib/hooks";
 import type { GeoCollection, MarketOverview } from "@/lib/types";
 
 const VENETO = ["padova", "vicenza", "treviso", "venezia", "rovigo"];
@@ -52,6 +53,8 @@ export default function Mercato() {
     queryKey: ["market", segment, area],
     queryFn: () => api<MarketOverview>(`/analytics/overview?segment=${segment}&area=${area}`),
     placeholderData: (prev) => prev,
+    // while the history is loading, check again until the page has data
+    refetchInterval: (q) => (q.state.data && !q.state.data.market.ready ? 20_000 : false),
   });
   const zones = useZones(segment);
   const opps = useQuery({
@@ -113,6 +116,8 @@ export default function Mercato() {
         <div className="grid place-items-center py-24">
           <Spinner />
         </div>
+      ) : !d.market.ready ? (
+        <MarketNotReady market={d.market} onStarted={() => void ov.refetch()} />
       ) : (
         <div className={cx("transition-opacity", ov.isFetching && "opacity-60")}>
           {/* headline figures */}
@@ -392,5 +397,36 @@ export default function Mercato() {
         </div>
       )}
     </Page>
+  );
+}
+
+/** No market data yet: say why, and let an admin start the load from here. */
+function MarketNotReady({ market, onStarted }: { market: MarketOverview["market"]; onStarted: () => void }) {
+  const { data: me } = useMe();
+  const load = useMutation({ mutationFn: () => post("/admin/history"), onSuccess: onStarted });
+  if (market.running)
+    return (
+      <Empty icon={<Spinner />} title={market.running === "history" ? "Caricamento dello storico in corso" : "Elaborazione in corso"}>
+        Stiamo leggendo dal Portale delle Vendite Pubbliche le vendite dal 2019 e calcolando i valori di zona: circa 10 minuti dopo la sincronizzazione.
+        Questa pagina si aggiorna da sola.
+      </Empty>
+    );
+  return (
+    <Empty icon={<ChartNoAxesColumn className="size-5" />} title="Lo storico di mercato non è ancora caricato">
+      <p>
+        Valori di zona, andamento dei prezzi e opportunità si calcolano sullo storico delle vendite dal 2019: si carica una volta sola (circa 10 minuti),
+        poi si aggiorna da solo ogni notte.
+      </p>
+      {me?.is_admin ? (
+        <div className="mt-5">
+          <Button variant="gold" loading={load.isPending} onClick={() => load.mutate()}>
+            Carica lo storico
+          </Button>
+          {load.error && <p className="mt-3 text-[13px] text-bad">{(load.error as Error).message}</p>}
+        </div>
+      ) : (
+        <p className="mt-3">Chiedi all'amministratore di caricarlo dalla pagina Admin.</p>
+      )}
+    </Empty>
   );
 }

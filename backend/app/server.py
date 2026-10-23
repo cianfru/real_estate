@@ -23,7 +23,7 @@ from app.db import SessionLocal
 from app.main import app as api
 from app.main import health
 from app.services.accounts import bootstrap_admin
-from app.services.first_load import close_interrupted_runs, needs_first_load, start_first_load
+from app.services.first_load import close_interrupted_runs, pending_steps, start_first_load
 
 SECURITY_HEADERS = {
     "X-Robots-Tag": "noindex, nofollow",
@@ -48,11 +48,11 @@ async def _lifespan(_: FastAPI) -> AsyncIterator[None]:
     try:
         bootstrap_admin(db)
         close_interrupted_runs(db)
-        first_load = needs_first_load(db)
+        steps = pending_steps(db)
     finally:
         db.close()
-    if first_load:
-        start_first_load()
+    if steps:
+        start_first_load(steps)
     yield
 
 

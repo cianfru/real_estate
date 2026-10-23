@@ -136,3 +136,22 @@ def test_history_button_starts_once(admin: TestClient, db: Any, monkeypatch: pyt
     db.commit()
     assert admin.post("/admin/history", headers=H).status_code == 409
     assert admin.get("/admin/stats").json()["storico"] == {"rows": 0, "since": None}
+
+
+def test_market_page_knows_when_its_data_is_ready(admin: TestClient, db: Any) -> None:
+    from datetime import UTC, datetime, timedelta
+
+    assert admin.get("/analytics/overview").json()["market"] == {
+        "ready": False,
+        "history_loaded": False,
+        "running": None,
+    }
+    now = datetime.now(UTC)
+    db.add(IngestRun(kind="history", status="ok", finished_at=now - timedelta(minutes=1)))
+    db.add(IngestRun(kind="analytics", status="running"))
+    db.commit()
+    m = admin.get("/analytics/overview").json()["market"]
+    assert m == {"ready": False, "history_loaded": True, "running": "analytics"}
+    db.add(IngestRun(kind="analytics", status="ok", finished_at=now))
+    db.commit()
+    assert admin.get("/analytics/overview").json()["market"]["ready"] is True

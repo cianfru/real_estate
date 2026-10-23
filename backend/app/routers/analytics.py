@@ -204,7 +204,17 @@ def overview(
         .where(IngestRun.kind == "analytics", IngestRun.status == "ok")
         .order_by(IngestRun.finished_at.desc())
     )
+    history_at = db.scalar(
+        select(func.max(IngestRun.finished_at)).where(IngestRun.kind == "history", IngestRun.status == "ok")
+    )
+    running = db.scalar(select(IngestRun.kind).where(IngestRun.status == "running").limit(1))
     return {
+        # the page has data once the history has been loaded and analysed at least once
+        "market": {
+            "ready": history_at is not None and last is not None and last >= history_at,
+            "history_loaded": history_at is not None,
+            "running": running,
+        },
         "segment": seg,
         "segments": SEGMENTS,
         "area": {

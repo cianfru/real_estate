@@ -68,27 +68,35 @@ def test_first_admin_from_environment(tmp_path: Path, db: Any, monkeypatch: pyte
     assert [u.email for u in db.query(User).all()] == ["avv@example.org"]
 
 
-def test_restart_closes_interrupted_runs_and_first_load_starts_once(
+def test_restart_closes_interrupted_runs_and_resumes_the_first_load(
     tmp_path: Path, db: Any, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     import app.server as server
     from app.config import get_settings
     from app.models import IngestRun
 
-    started: list[int] = []
-    monkeypatch.setattr(server, "start_first_load", lambda: started.append(1))
+    started: list[list[str]] = []
+    monkeypatch.setattr(server, "start_first_load", started.append)
     monkeypatch.setattr(get_settings(), "first_load_on_start", True)
-    db.add(IngestRun(kind="geocode", status="running"))
+
+    def boot() -> None:
+        with TestClient(create_site(tmp_path)):
+            pass
+
+    db.add(IngestRun(kind="sync", status="running"))
     db.commit()
-    with TestClient(create_site(tmp_path)):
-        pass
+    boot()
     db.expire_all()
     run = db.query(IngestRun).one()
     assert run.status == "failed" and "riavvio" in run.errors[-1]
-    assert started == [1]  # never synced: the first load starts
+    assert started == [["sync", "history"]]  # nothing succeeded yet: the whole load resumes
 
-    db.add(IngestRun(kind="sync", status="failed"))
+    db.add(IngestRun(kind="sync", status="ok"))
     db.commit()
-    with TestClient(create_site(tmp_path)):
-        pass
-    assert started == [1]  # a sync was attempted once: from now on it's the admin's call
+    boot()
+    assert started[-1] == ["history"]  # the sync is done, the history (and so Mercato) is not
+
+    db.add_all([IngestRun(kind="history", status="failed") for _ in range(3)])
+    db.commit()
+    boot()
+    assert len(started) == 2  # three failed tries: no more automatic attempts, the admin decides

@@ -384,6 +384,7 @@ export interface MarketOverview {
   area: { key: string; level: string; label: string };
   provinces: { key: string; label: string; n: number }[];
   computed_at: string | null;
+  market: { ready: boolean; history_loaded: boolean; running: string | null };
   kpis: {
     stima_median: number | null;
     stima_n: number;

@@ -67,8 +67,10 @@ variable `NIGHTLY_ON_GITHUB=true`), with the Railway cron service removed.
    minutes, ≈ 500 requests), analysis. The map says "Primo caricamento in corso" and fills as it
    goes; progress is in Admin → *Esecuzioni*. Everything in it is a silent *bootstrap*: no events,
    no alert emails. (`FIRST_LOAD_ON_START=false` turns this off.)
-6. **If a deploy interrupted it** (a restart kills the job; the next start marks it "interrotta"):
-   Admin → Italia → "Avvia la sincronizzazione", then *Storico di mercato* → "Carica lo storico".
+6. **If a deploy interrupted it**: nothing to do. Every start marks interrupted jobs "interrotta" and
+   resumes whatever part of the first load never succeeded (the national sync and/or the market
+   history), up to 3 tries per part. After that, Admin → "Avvia la sincronizzazione" or the
+   Mercato page's "Carica lo storico" button (admins), which also says when a load is running.
 7. **Resend (optional).** Verify the sending domain (`legalestateitalia.it`) in Resend, then set
    `RESEND_API_KEY` and `EMAIL_FROM` on `web` (the cron references them). Without a key, alerts
    are written to the log.
