@@ -375,10 +375,15 @@ export function MapView(props: Props) {
       if (propsRef.current.data) (map.getSource("lotti") as GeoJSONSource | undefined)?.setData(propsRef.current.data);
       (map.getSource("zones") as GeoJSONSource | undefined)?.setData(propsRef.current.zones ?? { type: "FeatureCollection", features: [] });
       renderPolygon(map, propsRef.current.polygon);
+      const sel = propsRef.current.selectedId;
+      if (sel !== null) map.setFeatureState({ source: "lotti", id: sel }, { selected: true });
     };
     const want = theme === "dark" ? STYLES.dark : STYLES.light;
     const current = (map as unknown as { _le_style?: string })._le_style;
-    if (current && current !== want) map.setStyle(want);
+    // diff: false = a full reload that fires "style.load". With the default diff, MapLibre patches the
+    // style in place, silently drops our sources and layers and never fires it: no markers after a
+    // theme switch until the page was reloaded.
+    if (current && current !== want) map.setStyle(want, { diff: false });
     (map as unknown as { _le_style?: string })._le_style = want;
     map.once("style.load", apply);
     if (map.isStyleLoaded() && !map.getSource("lotti")) apply();
