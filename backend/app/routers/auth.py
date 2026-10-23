@@ -7,8 +7,8 @@ from sqlalchemy.orm import Session
 from app.auth import clear_session, issue_session, session_user, verify_password
 from app.db import get_db
 from app.models import PasswordToken, User
-from app.schemas import ChangePasswordIn, ForgotPasswordIn, LoginIn, SetPasswordIn, TokenInfoOut, UserOut
-from app.services.accounts import email_link, new_link, password_problem, set_password, valid_token
+from app.schemas import ChangeEmailIn, ChangePasswordIn, ForgotPasswordIn, LoginIn, SetPasswordIn, TokenInfoOut, UserOut
+from app.services.accounts import email_link, new_link, password_problem, set_email, set_password, valid_token
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -58,6 +58,16 @@ def change_password(
     set_password(user, body.new_password)
     db.commit()
     issue_session(response, user)  # this browser stays logged in, every other session is closed
+    return _out(user)
+
+
+@router.post("/email", response_model=UserOut)
+def change_email(body: ChangeEmailIn, db: Session = Depends(get_db), user: User = Depends(session_user)) -> UserOut:
+    """Your own login email; the password confirms it's really you at the keyboard."""
+    if not verify_password(body.current_password, user.password_hash):
+        raise HTTPException(400, "La password non è corretta")
+    set_email(db, user, str(body.email))
+    db.commit()
     return _out(user)
 
 

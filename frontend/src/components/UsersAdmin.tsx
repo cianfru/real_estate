@@ -29,9 +29,15 @@ export function UsersAdmin() {
     },
   });
   const link = useMutation({ mutationFn: (id: number) => post<PasswordLink>(`/admin/users/${id}/link`), onSuccess: (r) => setIssued(r) });
+  const [editing, setEditing] = useState<{ id: number; name: string; email: string } | null>(null);
   const edit = useMutation({
-    mutationFn: ({ id, ...body }: { id: number; is_admin?: boolean; is_active?: boolean }) => patch<AdminUser>(`/admin/users/${id}`, body),
-    onSuccess: refresh,
+    mutationFn: ({ id, ...body }: { id: number; name?: string; email?: string; is_admin?: boolean; is_active?: boolean }) =>
+      patch<AdminUser>(`/admin/users/${id}`, body),
+    onSuccess: (u) => {
+      if (u.id === me?.id) qc.invalidateQueries({ queryKey: ["me"] });
+      setEditing(null);
+      refresh();
+    },
   });
   const error = (invite.error ?? link.error ?? edit.error) as Error | null;
 
@@ -70,6 +76,35 @@ export function UsersAdmin() {
       <ul className="mt-10 divide-y divide-line">
         {users.data?.map((u) => {
           const self = u.id === me?.id;
+          if (editing?.id === u.id)
+            return (
+              <li key={u.id} className="py-4">
+                <form
+                  className="space-y-4"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    edit.mutate({ id: u.id, name: editing.name, email: editing.email });
+                  }}
+                >
+                  <div className="grid gap-x-8 gap-y-4 sm:grid-cols-2">
+                    <Field label="Nome e cognome">
+                      <Input required autoFocus value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} />
+                    </Field>
+                    <Field label="Email di accesso">
+                      <Input type="email" required value={editing.email} onChange={(e) => setEditing({ ...editing, email: e.target.value })} />
+                    </Field>
+                  </div>
+                  <div className="flex gap-6">
+                    <Button type="submit" size="sm" variant="gold" loading={edit.isPending}>
+                      Salva
+                    </Button>
+                    <Button type="button" size="sm" variant="ghost" onClick={() => setEditing(null)}>
+                      Annulla
+                    </Button>
+                  </div>
+                </form>
+              </li>
+            );
           return (
             <li key={u.id} className={cx("grid gap-x-6 gap-y-1.5 py-4 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1.3fr)] sm:items-baseline", !u.is_active && "opacity-55")}>
               <div>
@@ -86,6 +121,9 @@ export function UsersAdmin() {
                 {u.is_active && !u.pending_invite && (u.last_login_at ? `ultimo accesso ${relative(u.last_login_at)}` : "mai entrato")}
               </p>
               <div className="flex flex-wrap gap-x-5 gap-y-1 text-[12.5px] sm:justify-end">
+                <button type="button" className="cursor-pointer text-muted hover:text-ink" onClick={() => setEditing({ id: u.id, name: u.name, email: u.email })}>
+                  Modifica
+                </button>
                 {u.is_active && (
                   <button type="button" className="cursor-pointer text-muted hover:text-ink" onClick={() => link.mutate(u.id)}>
                     {u.pending_invite ? "Nuovo invito" : "Link per nuova password"}

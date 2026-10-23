@@ -155,3 +155,30 @@ def test_market_page_knows_when_its_data_is_ready(admin: TestClient, db: Any) ->
     db.add(IngestRun(kind="analytics", status="ok", finished_at=now))
     db.commit()
     assert admin.get("/analytics/overview").json()["market"]["ready"] is True
+
+
+def test_change_an_email(admin: TestClient, db: Any) -> None:
+    db.add(User(email="fili@example.org", name="Staff", password_hash=hash_password("password-lunga")))
+    db.add(User(email="altro@example.org", name="Altro", password_hash=hash_password("password-lunga")))
+    db.commit()
+    sid = db.scalar(select(User.id).where(User.email == "fili@example.org"))
+
+    # an admin fixes someone's address
+    r = admin.patch(f"/admin/users/{sid}", json={"email": "Fil@Example.org"}, headers=H)
+    assert r.status_code == 200 and r.json()["email"] == "fil@example.org"
+    assert admin.patch(f"/admin/users/{sid}", json={"email": "altro@example.org"}, headers=H).status_code == 409
+    bad_address = admin.patch(f"/admin/users/{sid}", json={"email": "non-una-email"}, headers=H)
+    assert bad_address.status_code == 422 and bad_address.json()["detail"] == "Indirizzo email non valido"
+    staff = _login("fil@example.org", "password-lunga")
+    bad = TestClient(app).post(
+        "/auth/login", json={"email": "fili@example.org", "password": "password-lunga"}, headers=H
+    )
+    assert bad.status_code == 401
+
+    # and anyone can change their own, confirming with the password
+    wrong = {"email": "nuova@example.org", "current_password": "sbagliata"}
+    assert staff.post("/auth/email", json=wrong, headers=H).status_code == 400
+    ok = {"email": "nuova@example.org", "current_password": "password-lunga"}
+    assert staff.post("/auth/email", json=ok, headers=H).json()["email"] == "nuova@example.org"
+    assert staff.get("/auth/me").json()["email"] == "nuova@example.org"  # still logged in
+    _login("nuova@example.org", "password-lunga")

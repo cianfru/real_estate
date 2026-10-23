@@ -1,6 +1,8 @@
 import logging
 
 from fastapi import FastAPI, Request
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
@@ -28,6 +30,22 @@ app.add_middleware(
 )
 
 SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
+
+
+@app.exception_handler(RequestValidationError)
+async def readable_validation_error(request: Request, exc: RequestValidationError) -> JSONResponse:
+    """One short Italian sentence for the screen instead of pydantic's English list; the full
+    list stays under `errors` for debugging."""
+    first = exc.errors()[0] if exc.errors() else {}
+    field = str(first.get("loc", ["", ""])[-1])
+    message = (
+        "Indirizzo email non valido"
+        if "email" in field
+        else f"Valore non valido: {field}"
+        if field
+        else "Richiesta non valida"
+    )
+    return JSONResponse({"detail": message, "errors": jsonable_encoder(exc.errors())}, status_code=422)
 
 
 @app.middleware("http")

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
-import { LogoMark } from "@/components/Logo";
+import { Logo, LogoLockup } from "@/components/Logo";
 
 /** The split screen of the signed-out pages: navy panel on the left, the form on the right. */
 export function AuthLayout({ children }: { children: ReactNode }) {
@@ -13,10 +13,10 @@ export function AuthLayout({ children }: { children: ReactNode }) {
           style={{ background: "radial-gradient(70% 60% at 25% 20%, rgb(224 179 29 / 0.18), transparent 60%)" }}
         />
         <div className="relative flex h-full flex-col justify-between p-14 text-[#f6f5f2]">
-          <LogoMark className="size-11" />
+          <span />
           <div>
-            <p className="max-w-md font-serif text-[44px] leading-[1.08] tracking-tight">Aste immobiliari, con il rigore di uno studio legale.</p>
-            <p className="mt-5 max-w-sm text-[14px] leading-relaxed text-[#f6f5f2]/60">
+            <LogoLockup className="w-[380px] max-w-full" />
+            <p className="mt-10 max-w-sm text-[14px] leading-relaxed text-[#f6f5f2]/60">
               Ogni asta giudiziaria pubblicata sul Portale delle Vendite Pubbliche, letta zona per zona.
             </p>
           </div>
@@ -25,7 +25,9 @@ export function AuthLayout({ children }: { children: ReactNode }) {
       </div>
       <div className="grid place-items-center px-6 py-16">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }} className="w-full max-w-[360px]">
-          <LogoMark className="mb-6 size-10 lg:hidden" />
+          <div className="mb-8 lg:hidden">
+            <Logo />
+          </div>
           {children}
           <p className="mt-20 text-[11.5px] text-faint">Dati dal Portale delle Vendite Pubbliche, Ministero della Giustizia.</p>
         </motion.div>

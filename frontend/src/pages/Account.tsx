@@ -23,8 +23,42 @@ export default function Account() {
     },
   });
 
+  const [newEmail, setNewEmail] = useState("");
+  const [emailPassword, setEmailPassword] = useState("");
+  const changeEmail = useMutation({
+    mutationFn: () => post<User>("/auth/email", { email: newEmail, current_password: emailPassword }),
+    onSuccess: (u) => {
+      qc.setQueryData(["me"], u);
+      setNewEmail("");
+      setEmailPassword("");
+    },
+  });
+
   return (
     <Page title="Il tuo account" subtitle={me ? `${me.name} · ${me.email} · ${me.role === "client" ? `area riservata${me.cliente_name ? ` di ${me.cliente_name}` : ""}` : me.is_admin ? "amministratore" : "collaboratore"}` : undefined}>
+      <section className="mb-16 max-w-md">
+        <SectionTitle>Email di accesso</SectionTitle>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            changeEmail.mutate();
+          }}
+          className="mt-6 space-y-7"
+        >
+          <Field label="Nuova email" hint={me ? `Oggi accedi con ${me.email}.` : undefined}>
+            <Input type="email" autoComplete="email" required value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
+          </Field>
+          <Field label="Password, per conferma">
+            <Input type="password" autoComplete="current-password" required value={emailPassword} onChange={(e) => setEmailPassword(e.target.value)} />
+          </Field>
+          {changeEmail.error && <p className="text-[13px] text-bad">{(changeEmail.error as Error).message}</p>}
+          {changeEmail.isSuccess && <p className="text-[13px] text-ok">Email cambiata: dal prossimo accesso usa {me?.email}.</p>}
+          <Button type="submit" variant="primary" loading={changeEmail.isPending}>
+            Cambia email
+          </Button>
+        </form>
+      </section>
+
       <section className="max-w-md">
         <SectionTitle>Cambia password</SectionTitle>
         <form

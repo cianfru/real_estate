@@ -51,6 +51,15 @@ def new_link(db: Session, user: User, purpose: str, created_by: User | None = No
     return f"{get_settings().public_app_url.rstrip('/')}/accesso/{raw}"
 
 
+def set_email(db: Session, user: User, email: str) -> None:
+    """Change the login email (stored lowercase); refused if another account already uses it."""
+    email = email.strip().lower()
+    taken = db.scalar(select(User.id).where(func.lower(User.email) == email, User.id != user.id))
+    if taken:
+        raise HTTPException(409, "Esiste già un utente con questa email")
+    user.email = email
+
+
 def invite(
     db: Session, *, email: str, name: str, created_by: User, is_admin: bool = False, cliente_id: int | None = None
 ) -> tuple[User, str]:

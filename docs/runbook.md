@@ -107,6 +107,7 @@ Every step writes a row in `ingest_runs`, visible on the **Admin** page with cou
 | change the opportunity thresholds | set `OPPORTUNITY_THRESHOLD_PCT` / `OPPORTUNITY_AUCTION_PCT` on the cron service, then run `analytics` |
 | resend today's alerts | `python -m ingest alerts --run-id <sync run id>` (already-sent events are skipped) |
 | invite a person | Admin → *Persone dello studio* → name, email, "Invita" |
+| fix someone's name or email | Admin → *Persone dello studio* → "Modifica"; your own email: click your name (top right) → *Email di accesso* |
 | forgotten password | the person uses "Password dimenticata?" on the login page (needs Resend), or Admin → "Link per nuova password" |
 | disable / re-enable a person | Admin → "Disattiva" / "Riattiva" (their open sessions stop at once) |
 | give a client access to their area | Clienti → the client → *Area riservata del cliente* → name, email, "Dai accesso al cliente"; they see the properties linked to them |

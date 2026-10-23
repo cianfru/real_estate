@@ -11,7 +11,7 @@ from app.auth import admin_user
 from app.db import get_db
 from app.models import User
 from app.schemas import AdminUserOut, PasswordLinkOut, UserCreateIn, UserPatchIn
-from app.services.accounts import email_link, invite, new_link
+from app.services.accounts import email_link, invite, new_link, set_email
 
 router = APIRouter(prefix="/admin/users", tags=["admin"])
 
@@ -61,6 +61,8 @@ def edit(uid: int, body: UserPatchIn, db: Session = Depends(get_db), admin: User
         raise HTTPException(409, "Non puoi disattivare il tuo account o togliergli i permessi di amministratore")
     if body.name is not None:
         user.name = body.name.strip()
+    if body.email is not None:
+        set_email(db, user, str(body.email))
     if body.is_admin is not None:
         user.is_admin = body.is_admin
     if body.is_active is not None:

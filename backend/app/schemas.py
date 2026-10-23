@@ -405,8 +405,14 @@ class UserCreateIn(BaseModel):
 
 class UserPatchIn(BaseModel):
     name: str | None = Field(None, min_length=1, max_length=200)
+    email: EmailStr | None = None
     is_admin: bool | None = None
     is_active: bool | None = None
+
+
+class ChangeEmailIn(BaseModel):
+    email: EmailStr
+    current_password: str = Field(max_length=200)
 
 
 class PasswordLinkOut(BaseModel):
